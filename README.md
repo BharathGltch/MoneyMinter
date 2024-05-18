@@ -20,3 +20,5 @@ Tailwind
 Postgresql
 
 Kafka MQ
+
+Inspired from FujiwaraChoka
