@@ -15,8 +15,8 @@ export function getPexelsVideo(searchTerm) {
     return __awaiter(this, void 0, void 0, function* () {
         let response = yield fetch(`https://api.pexels.com/videos/search?query=${searchTerm}&per_page=1`, {
             headers: {
-                "Authorization": PEXELS_API_KEY ? PEXELS_API_KEY : ""
-            }
+                Authorization: PEXELS_API_KEY ? PEXELS_API_KEY : "",
+            },
         });
         let jsonResponse = yield response.json();
         console.log(JSON.stringify(jsonResponse.videos[0].video_files));
@@ -35,5 +35,6 @@ export function downloadVideo(videoUrl) {
         https.get(videoUrl, (response) => {
             response.pipe(stream);
         });
+        return videoName;
     });
 }

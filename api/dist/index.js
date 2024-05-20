@@ -14,7 +14,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getJsonSearchTerms } from "./util/geminiFolder/gemini.js";
 import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
 dotenv.config();
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const corsOptions = {
     credentials: true,
     origin: "*", // Whitelist the domains you want to allow
@@ -27,14 +27,14 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.get("/home", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let videoUrl = yield getPexelsVideo("Beijing is cool");
-    yield downloadVideo(videoUrl);
-    res.json({ "message": "Done" });
+    let videoName = yield downloadVideo(videoUrl);
+    res.json({ message: "Done" });
 }));
 app.get("/prompt", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let message = yield example();
     const query = "Write a story about a magic backpack";
     let searchTerms = yield getJsonSearchTerms(query, message, 3);
-    res.send(`The text is ${message}\n adn the search terms are ${searchTerms}`);
+    res.send(`The text is ${message}\n and the search terms are ${searchTerms}`);
 }));
 app.listen(port, () => {
     console.log(`Listening on localhost:${port}`);
