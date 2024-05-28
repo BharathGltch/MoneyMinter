@@ -5,7 +5,7 @@ ffmpegfluent.setFfmpegPath(ffmpegStatic as string);
 
 export function resizeVideo(originalPath: string) {
   ffmpegfluent(originalPath)
-    .size("1920x1080")
+    .size("1080x1920")
     .on("end", () => {
       console.log("ffmpeg has completed");
     })
@@ -21,11 +21,9 @@ export function burnSubtitles(filePath: string) {
     "F:\\ProjectsOpenSource\\React-Projects\\MoneyMinter\\MoneyMinter\\api\\downloads\\e67eb29e-a553-4dfd-9590-5561f6a23668.mp4";
   const xPosition = "(w-text_w)/2"; // Centered horizontally
   const yPosition = "(h-text_h)-30"; // 30 pixels from the bottom
+  let subtitles = "downloads/some.srt";
   ffmpegfluent(path)
-    .outputOptions(
-      `-vf`,
-      `drawtext=text="${someText}":fontsize=${50}:fontcolor=${"black"}:x=${xPosition}:y=${yPosition}`
-    )
+    .outputOptions(`-vf`, `subtitles=${subtitles}`)
     .on("error", (error) => {
       console.log(error);
     })
@@ -38,4 +36,17 @@ export function burnSubtitles(filePath: string) {
     .save("output.mp4");
 }
 
-burnSubtitles("as");
+export function combineAudioAndVideo() {
+  ffmpegfluent("output.mp4")
+    .input("output.mp3")
+    .outputOptions("-c", "copy")
+    .outputOptions("-map", "0:v:0")
+    .outputOptions("-map", "1:a:0")
+    .save("combinedVideo.mp4")
+    .on("end", () => {
+      console.log("Output Video Created successfully");
+    });
+}
+
+//burnSubtitles("as");
+combineAudioAndVideo();

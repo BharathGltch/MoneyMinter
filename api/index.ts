@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getJsonSearchTerms } from "./util/geminiFolder/gemini.js";
 import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
+import { getSrtFile } from "./util/geminiFolder/gemini.js";
+import { TypedRequestBody } from "./@types/index";
 
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -32,8 +34,18 @@ app.get("/prompt", async (req, res) => {
   let message = await example();
   const query = "Write a story about a magic backpack";
   let searchTerms = await getJsonSearchTerms(query, message, 3);
+  await getSrtFile(message);
   res.send(`The text is ${message}\n and the search terms are ${searchTerms}`);
 });
+
+app.get(
+  "/process",
+  async (req: TypedRequestBody<{ queryString: string }>, res) => {
+    let query = req.body.queryString;
+    console.log("The query is " + query);
+    res.json({ query });
+  }
+);
 
 app.listen(port, () => {
   console.log(`Listening on localhost:${port}`);

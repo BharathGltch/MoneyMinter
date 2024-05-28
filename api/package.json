@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:generate": "npx drizzle-kit generate",
+    "db:drop": "npx drizzle-kit drop"
   },
   "keywords": [],
   "author": "",
@@ -14,18 +16,27 @@
     "axios": "^1.6.8",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.30.10",
     "express": "^4.19.2",
     "ffmpeg-static": "^5.2.0",
     "fluent-ffmpeg": "^2.1.2",
+    "gtts": "^0.2.1",
     "openai": "^4.38.5",
-    "uuid": "^9.0.1"
+    "pg": "^8.11.5",
+    "postgres": "^3.4.4",
+    "say": "^0.16.0",
+    "uuid": "^9.0.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/fluent-ffmpeg": "^2.1.24",
     "@types/node": "^20.12.7",
+    "@types/pg": "^8.11.6",
     "@types/uuid": "^9.0.8",
+    "drizzle-kit": "^0.21.4",
+    "tsx": "^4.11.0",
     "typescript": "^5.4.5"
   },
   "type": "module"
