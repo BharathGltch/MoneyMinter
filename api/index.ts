@@ -2,10 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getJsonSearchTerms } from "./util/geminiFolder/gemini.js";
+import { getJsonSearchTerms,generateScript } from "./util/geminiFolder/gemini.js";
 import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
 import { getSrtFile } from "./util/geminiFolder/gemini.js";
-import { TypedRequestBody } from "./@types/index";
+import { TypedRequestBody,ProcessBody,processBodySchema } from "./@types/index.js";
+import {validateBody} from "./middleware/index.js";
+import {db} from "./drizzle/db.js";
 
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -39,11 +41,14 @@ app.get("/prompt", async (req, res) => {
 });
 
 app.get(
-  "/process",
+  "/process",validateBody(processBodySchema),
   async (req: TypedRequestBody<{ queryString: string }>, res) => {
     let query = req.body.queryString;
     console.log("The query is " + query);
-    res.json({ query });
+    //generate the script
+   let generatedScript= await generateScript(query);
+
+
   }
 );
 

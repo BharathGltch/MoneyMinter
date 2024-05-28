@@ -5,6 +5,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getJsonSearchTerms } from "./util/geminiFolder/gemini.js";
 import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
 import { getSrtFile } from "./util/geminiFolder/gemini.js";
+import { processBodySchema } from "./@types/index.js";
+import { validateBody } from "./middleware/index.js";
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const corsOptions = {
@@ -29,7 +31,7 @@ app.get("/prompt", async (req, res) => {
     await getSrtFile(message);
     res.send(`The text is ${message}\n and the search terms are ${searchTerms}`);
 });
-app.get("/process", async (req, res) => {
+app.get("/process", validateBody(processBodySchema), async (req, res) => {
     let query = req.body.queryString;
     console.log("The query is " + query);
     res.json({ query });

@@ -75,3 +75,14 @@ async function writeSrt(text: string) {
     console.log("Srt finished");
   });
 }
+
+export async function generateScript(queryString:string){
+  const prompt = `Generate a script for a Youtube Short based on an idea.
+  Only return the text. It should be concise. Dont add anything like Hello or Great to the Response.
+  Example: idea:Write a story about C++
+  Example Response:"C++ is the mightiest language of all which was created in the year..." and so on.
+  Optimize the script so that it might get the maximize views on Youtube. It should be concise if possible.
+
+  Here is the idea:${queryString}
+  `;
+}
