@@ -2,11 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getJsonSearchTerms } from "./util/geminiFolder/gemini.js";
+import { getJsonSearchTerms, generateScript } from "./util/geminiFolder/gemini.js";
 import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
 import { getSrtFile } from "./util/geminiFolder/gemini.js";
 import { processBodySchema } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
+import { createCoin, insertPexelsVideoPath, insertScript, insertSearchTerms } from "./drizzle/dbUtil/dbUtil.js";
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const corsOptions = {
@@ -28,13 +29,32 @@ app.get("/prompt", async (req, res) => {
     let message = await example();
     const query = "Write a story about a magic backpack";
     let searchTerms = await getJsonSearchTerms(query, message, 3);
-    await getSrtFile(message);
+    //await getSrtFile(message);
     res.send(`The text is ${message}\n and the search terms are ${searchTerms}`);
 });
 app.get("/process", validateBody(processBodySchema), async (req, res) => {
     let query = req.body.queryString;
     console.log("The query is " + query);
-    res.json({ query });
+    let coinId = await createCoin(query);
+    //generate the script
+    let generatedScript = await generateScript(query);
+    //Insert Script into Table
+    await insertScript(coinId, generatedScript);
+    //generate the jsonSearchTerms
+    let searchTerms = await getJsonSearchTerms(query, generatedScript, 3);
+    //insert the searchTerms
+    await insertSearchTerms(coinId, searchTerms[0]);
+    //Get the Pexels video link
+    let videoLink = await getPexelsVideo(searchTerms[0]);
+    //download Video
+    let pexelsVideoPath = await downloadVideo(videoLink);
+    //save the path to the db
+    await insertPexelsVideoPath(coinId, pexelsVideoPath);
+    //generate the srt file 
+    let fileName = pexelsVideoPath.slice(0, pexelsVideoPath.length - 4);
+    let srtFilePath = await getSrtFile(fileName, generatedScript);
+    console.log(srtFilePath);
+    res.json({ message: "Done" });
 });
 app.listen(port, () => {
     console.log(`Listening on localhost:${port}`);

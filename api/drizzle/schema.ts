@@ -11,5 +11,11 @@ export const CoinTable=pgTable("coin",{
   id:uuid("id").primaryKey().defaultRandom(),
   idea:text("idea").notNull(),
   userId:uuid("userId").references(()=>UserTable.id),
-  script:text('text')
+  script:text('text'),
+  searchTerms:text("searchTerms"),
+  pexelVideo: text("pexelVideo"),
+  srtFilePath:text("srtFilePath"),
+  subtitledVideo:text("subtitledVideo"),
+  audioPath:text("audioPath"),
+  finalVideoPath:text("finalVideoPath")
 })

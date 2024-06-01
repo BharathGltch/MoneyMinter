@@ -28,11 +28,11 @@ export async function getJsonSearchTerms(query, script, noOfSearchTerms) {
     console.log("The arr length is " + arr.length);
     return arr;
 }
-export async function getSrtFile(inputText) {
+export async function getSrtFile(srtFileName, inputText) {
     const prompt = `Generate an srt file for a given text  
     
 
-    Only the srt file is to be returned. Dont give anhy other response like Certainly! or anything similar.
+    Only the srt file is to be returned. Dont give any other response like Certainly! or anything similar.
 
     here is an example of a response:
     "1
@@ -43,6 +43,10 @@ export async function getSrtFile(inputText) {
     00:00:06,001 --> 00:00:12,000
     Inside, he found magical items like an illuminating orb, a thirst-quenching canteen, and a true-north compass."
 
+    and so on
+
+    It can have any number of lines but should be such that it is can get the maximum number of views for a youtube short. It can be of any duration, but should be short enough to be uploaded to Youtube shorts.
+
 
     ONLY return the srt file.
     Do not return anything else
@@ -51,15 +55,31 @@ export async function getSrtFile(inputText) {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    await writeSrt(text);
-    return;
+    let srtFilePath = await writeSrt(srtFileName, text);
+    return srtFilePath;
 }
-async function writeSrt(text) {
-    let path = "downloads/some.srt";
+async function writeSrt(pexelsVideoPath, text) {
+    let path = "downloads/" + pexelsVideoPath + "_srt.srt";
     const stream = fs.createWriteStream(path);
     stream.write(text);
     stream.end();
     stream.on("finish", () => {
         console.log("Srt finished");
     });
+    return path;
+}
+export async function generateScript(queryString) {
+    const prompt = `Generate a script for a Youtube Short based on an idea.
+  Only return the text. It should be concise. Dont add anything like Hello or Great to the Response.
+  Example: idea:Write a story about C++
+  Example Response:"C++ is the mightiest language of all which was created in the year..." and so on.
+  Optimize the script so that it might get the maximize views on Youtube. It should be concise if possible.
+
+  Here is the idea:${queryString}
+  `;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log(text);
+    return text;
 }
