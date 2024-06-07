@@ -17,7 +17,7 @@ export async function getJsonSearchTerms(query, script, noOfSearchTerms) {
     Obviously, the search terms should be related to the subject of the video
 
     ONLY return the array of JSON-array of strings.
-    Do not return anything else
+    Do not return anything else like "heres the response" or " \`\`\`json"
     For context here is the full script ${script}
     `;
     const result = await model.generateContent(prompt);
@@ -45,7 +45,7 @@ export async function getSrtFile(srtFileName, inputText) {
 
     and so on
 
-    It can have any number of lines but should be such that it is can get the maximum number of views for a youtube short. It can be of any duration, but should be short enough to be uploaded to Youtube shorts.
+    It can have any number of lines but should be such that it is can get the maximum number of views for a youtube short.It should be like somebody is narrating the lines. It can be of any duration, but should be short enough to be uploaded to Youtube shorts.
 
 
     ONLY return the srt file.
@@ -60,13 +60,14 @@ export async function getSrtFile(srtFileName, inputText) {
 }
 async function writeSrt(pexelsVideoPath, text) {
     let path = "downloads/" + pexelsVideoPath + "_srt.srt";
+    let returnPath = pexelsVideoPath + "_srt.srt";
     const stream = fs.createWriteStream(path);
     stream.write(text);
     stream.end();
     stream.on("finish", () => {
         console.log("Srt finished");
     });
-    return path;
+    return returnPath;
 }
 export async function generateScript(queryString) {
     const prompt = `Generate a script for a Youtube Short based on an idea.

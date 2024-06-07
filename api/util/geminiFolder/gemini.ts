@@ -23,7 +23,7 @@ export async function getJsonSearchTerms(
     Obviously, the search terms should be related to the subject of the video
 
     ONLY return the array of JSON-array of strings.
-    Do not return anything else
+    Do not return anything else like "heres the response" or " \`\`\`json"
     For context here is the full script ${script}
     `;
 
@@ -36,7 +36,10 @@ export async function getJsonSearchTerms(
   return arr;
 }
 
-export async function getSrtFile(srtFileName:string,inputText: string): Promise<string> {
+export async function getSrtFile(
+  srtFileName: string,
+  inputText: string
+): Promise<string> {
   const prompt = `Generate an srt file for a given text  
     
 
@@ -64,12 +67,13 @@ export async function getSrtFile(srtFileName:string,inputText: string): Promise<
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();
-  let srtFilePath=await writeSrt(srtFileName,text);
+  let srtFilePath = await writeSrt(srtFileName, text);
   return srtFilePath;
 }
 
-async function writeSrt(pexelsVideoPath:string,text: string) {
-  let path = "downloads/"+pexelsVideoPath+"_srt.srt";
+async function writeSrt(pexelsVideoPath: string, text: string) {
+  let path = "downloads/" + pexelsVideoPath + "_srt.srt";
+  let returnPath = pexelsVideoPath + "_srt.srt";
   const stream = fs.createWriteStream(path);
 
   stream.write(text);
@@ -78,10 +82,10 @@ async function writeSrt(pexelsVideoPath:string,text: string) {
   stream.on("finish", () => {
     console.log("Srt finished");
   });
-  return path;
+  return returnPath;
 }
 
-export async function generateScript(queryString:string):Promise<string>{
+export async function generateScript(queryString: string): Promise<string> {
   const prompt = `Generate a script for a Youtube Short based on an idea.
   Only return the text. It should be concise. Dont add anything like Hello or Great to the Response.
   Example: idea:Write a story about C++
@@ -96,5 +100,4 @@ export async function generateScript(queryString:string):Promise<string>{
   const text = response.text();
   console.log(text);
   return text;
-
 }

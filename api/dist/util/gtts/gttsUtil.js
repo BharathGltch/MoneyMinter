@@ -1,8 +1,14 @@
 import gTTS from "gtts";
+import fs from "fs";
 import say from "say";
-export function textToSpeech(text) {
+export function textToSpeech(textFilePath) {
+    let path = "downloads/" + textFilePath;
+    let data = fs.readFileSync(path);
+    let text = data.toString();
+    let outputPath = "audioMp3" + textFilePath.slice(0, textFilePath.length - 4) + ".mp3";
+    let actualOutputPath = "downloads/" + outputPath;
     const gtts = new gTTS(text);
-    gtts.save("output.mp3", (err) => {
+    gtts.save(actualOutputPath, (err) => {
         if (err) {
             console.log("error");
         }
@@ -10,17 +16,11 @@ export function textToSpeech(text) {
             console.log("Audio saved");
         }
     });
+    return outputPath;
 }
 function textToSpeechSay(text) {
     say.export(text, undefined, 1.0, "some.mp3", (err) => {
         if (err)
             return console.log(err);
     });
-}
-try {
-    textToSpeech("Hello how are you");
-    //   textToSpeechSay("Hello how are you");
-}
-catch (ex) {
-    console.log(ex);
 }
