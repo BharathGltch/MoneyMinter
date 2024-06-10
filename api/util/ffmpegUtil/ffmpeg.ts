@@ -31,24 +31,33 @@ function processResizeVideo(originalPath:string):Promise<void>{
     })
 }
 
-export function burnSubtitles(videoFilePath: string, srtFilePath: string) {
+export async function burnSubtitles(videoFilePath: string, srtFilePath: string) {
   let outputPath = "downloads/subtitlesBurned" + videoFilePath;
   let inputVideoFilePath = "downloads/" + videoFilePath;
   let inputSrtFilePath = "downloads/" + srtFilePath;
-  ffmpegfluent(inputVideoFilePath)
-    .outputOptions(`-vf`, `subtitles=${inputSrtFilePath}`)
-    .on("error", (error) => {
-      console.log("The error is "+error);
-    })
-    .on("complete", () => {
-      console.log("complete");
-    })
-    .on("end", () => {
-      console.log("Processing finished succesfully");
-    })
-    .save(outputPath);
+  await processburningSubtitles(inputVideoFilePath,inputSrtFilePath,outputPath);
   return outputPath;
 }
+
+ export async function processburningSubtitles(inputVideoFilePath:string,inputSrtFilePath:string,outputPath:string):Promise<void>{
+    return new Promise((resolve,reject)=>{
+      ffmpegfluent(inputVideoFilePath)
+      .outputOptions(`-vf`, `subtitles=${inputSrtFilePath}`)
+      .on("error", (error) => {
+        console.log("The error is "+error);
+        reject(error);
+      })
+      .on("complete", () => {
+        console.log("complete");
+      })
+      .on("end", () => {
+        console.log("Processing finished succesfully");
+        resolve();
+      })
+      .save(outputPath);
+    return outputPath;
+    })
+ }  
 
 export function combineAudioAndVideo() {
   ffmpegfluent("output.mp4")
@@ -62,21 +71,31 @@ export function combineAudioAndVideo() {
     });
 }
 
-export function convertSrtToText(srtFilePath: string) {
+export async function convertSrtToText(srtFilePath: string) {
   let srtPath = "downloads/" + srtFilePath;
   let fileName = "textSrt_" + srtFilePath;
   let outputPath = "downloads/textSrt_" + srtFilePath;
-  let output = "";
-  fs.createReadStream(srtPath)
+  await processConvertingSrtToText(srtPath,outputPath);
+  return fileName;
+}
+
+async function processConvertingSrtToText(srtPath:string,outputPath:string):Promise<void>{
+    let output="";
+  return new Promise((resolve,reject)=>{
+    fs.createReadStream(srtPath)
     .pipe(parse())
     .on("data", (node) => {
-      output += node.data.text;
+      output += node.data.text+" ";
     })
-    .on("error", console.error)
+    .on("error", (error)=>{
+      reject(error);
+    })
     .on("finish", () => {
       filehandle: fs.writeFileSync(outputPath, output);
+      resolve();
     });
-  return fileName;
+  })
+
 }
 
 //burnSubtitles("as");

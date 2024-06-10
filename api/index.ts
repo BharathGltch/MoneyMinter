@@ -90,10 +90,11 @@ app.get(
       inputForSubtitlesSrt
     );
     console.log(subtitledVideoPath);
-    // //insert the subtitled video path into the db
-    // await insertResizedVideoPath(coinId, subtitledVideoPath);
-    // //generate text from subtitles
-    // let textFilePath = convertSrtToText(srtFilePath);
+    //insert the subtitled video path into the db
+    await insertResizedVideoPath(coinId, subtitledVideoPath);
+    //generate text from subtitles
+    let textFilePath = await convertSrtToText(srtFilePath);
+    console.log(textFilePath);
 
     // //generate audio from the textFile
     // let audioFilePath = textToSpeech(textFilePath);

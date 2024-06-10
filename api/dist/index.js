@@ -7,8 +7,8 @@ import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
 import { getSrtFile } from "./util/geminiFolder/gemini.js";
 import { processBodySchema, } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
-import { createCoin, insertPexelsVideoPath, insertScript, insertSearchTerms, insertSrtFilePath, } from "./drizzle/dbUtil/dbUtil.js";
-import { burnSubtitles, resizeVideo, } from "./util/ffmpegUtil/ffmpeg.js";
+import { createCoin, insertPexelsVideoPath, insertResizedVideoPath, insertScript, insertSearchTerms, insertSrtFilePath, } from "./drizzle/dbUtil/dbUtil.js";
+import { burnSubtitles, convertSrtToText, resizeVideo, } from "./util/ffmpegUtil/ffmpeg.js";
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const corsOptions = {
@@ -54,10 +54,11 @@ app.get("/process", validateBody(processBodySchema), async (req, res) => {
     let inputForSubtitlesSrt = srtFilePath;
     let subtitledVideoPath = await burnSubtitles(inputForSubtitlesVideo, inputForSubtitlesSrt);
     console.log(subtitledVideoPath);
-    // //insert the subtitled video path into the db
-    // await insertResizedVideoPath(coinId, subtitledVideoPath);
-    // //generate text from subtitles
-    // let textFilePath = convertSrtToText(srtFilePath);
+    //insert the subtitled video path into the db
+    await insertResizedVideoPath(coinId, subtitledVideoPath);
+    //generate text from subtitles
+    let textFilePath = await convertSrtToText(srtFilePath);
+    console.log(textFilePath);
     // //generate audio from the textFile
     // let audioFilePath = textToSpeech(textFilePath);
     // console.log(audioFilePath);
