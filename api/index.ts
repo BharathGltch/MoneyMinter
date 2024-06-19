@@ -17,6 +17,7 @@ import { validateBody } from "./middleware/index.js";
 import { db } from "./drizzle/db.js";
 import {
   createCoin,
+  insertFinalVideoPath,
   insertPexelsVideoPath,
   insertResizedVideoPath,
   insertScript,
@@ -25,7 +26,9 @@ import {
 } from "./drizzle/dbUtil/dbUtil.js";
 import {
   burnSubtitles,
+  combineAudioAndVideo,
   convertSrtToText,
+  getVideoDuration,
   resizeVideo,
 } from "./util/ffmpegUtil/ffmpeg.js";
 import { textToSpeech } from "./util/gtts/gttsUtil.js";
@@ -67,11 +70,15 @@ app.get(
     let videoLink = await getPexelsVideo(searchTerms[0]);
     //download Video
     let pexelsVideoPath = await downloadVideo(videoLink);
+    console.log("The pexels video path is "+pexelsVideoPath);
     //save the path to the db
     await insertPexelsVideoPath(coinId, pexelsVideoPath);
     //generate the srt file
+    let videoDuration=await  getVideoDuration(pexelsVideoPath);
+    console.log("Video duration is",videoDuration);
+
     let fileName = pexelsVideoPath.slice(0, pexelsVideoPath.length - 4);
-    let srtFilePath = await getSrtFile(fileName, generatedScript);
+    let srtFilePath = await getSrtFile(fileName, generatedScript,videoDuration);
     console.log("The srtFiePath is " + srtFilePath);
 
     //insert the srt file path
@@ -96,11 +103,17 @@ app.get(
     let textFilePath = await convertSrtToText(srtFilePath);
     console.log(textFilePath);
 
-    // //generate audio from the textFile
-    // let audioFilePath = textToSpeech(textFilePath);
-    // console.log(audioFilePath);
-
-    res.json({ message: "Done" });
+    //generate audio from the textFile
+     let audioFilePath =await textToSpeech(textFilePath);
+     console.log ("The aduioFilePath is", audioFilePath);
+      
+     //combine audio with video files
+     let finalVideoPath=await combineAudioAndVideo(subtitledVideoPath,audioFilePath);
+      //insert the videoPath
+      insertFinalVideoPath(coinId,finalVideoPath);
+     
+    
+    res.json({ finalVideoPath });
   }
 );
 

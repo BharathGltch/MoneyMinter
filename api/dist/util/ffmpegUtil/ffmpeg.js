@@ -1,8 +1,10 @@
 import ffmpegStatic from "ffmpeg-static";
 import ffmpegfluent from "fluent-ffmpeg";
+import { path as ffprobePath } from "ffprobe-static";
 import fs from "fs";
 import { parse } from "subtitle";
 ffmpegfluent.setFfmpegPath(ffmpegStatic);
+ffmpegfluent.setFfprobePath(ffprobePath);
 export async function resizeVideo(originalPath) {
     let returnPath = "resizedVideo_" + originalPath;
     await processResizeVideo(originalPath);
@@ -28,11 +30,12 @@ function processResizeVideo(originalPath) {
     });
 }
 export async function burnSubtitles(videoFilePath, srtFilePath) {
+    let retPath = "subtitlesBurned" + videoFilePath;
     let outputPath = "downloads/subtitlesBurned" + videoFilePath;
     let inputVideoFilePath = "downloads/" + videoFilePath;
     let inputSrtFilePath = "downloads/" + srtFilePath;
     await processburningSubtitles(inputVideoFilePath, inputSrtFilePath, outputPath);
-    return outputPath;
+    return retPath;
 }
 export async function processburningSubtitles(inputVideoFilePath, inputSrtFilePath, outputPath) {
     return new Promise((resolve, reject) => {
@@ -53,15 +56,28 @@ export async function processburningSubtitles(inputVideoFilePath, inputSrtFilePa
         return outputPath;
     });
 }
-export function combineAudioAndVideo() {
-    ffmpegfluent("output.mp4")
-        .input("output.mp3")
-        .outputOptions("-c", "copy")
-        .outputOptions("-map", "0:v:0")
-        .outputOptions("-map", "1:a:0")
-        .save("combinedVideo.mp4")
-        .on("end", () => {
-        console.log("Output Video Created successfully");
+export async function combineAudioAndVideo(videoPath, audioPath) {
+    let outputPath = "downloads/finalVideo" + videoPath;
+    let actualVideoPath = "downloads/" + videoPath;
+    let actualAudioPath = "downloads/" + audioPath;
+    await processCombiningAudioAndVideo(actualVideoPath, actualAudioPath, outputPath);
+    return outputPath;
+}
+async function processCombiningAudioAndVideo(actualVideoPath, actualAudioPath, outputPath) {
+    return new Promise((resolve, reject) => {
+        ffmpegfluent(actualVideoPath)
+            .input(actualAudioPath)
+            .outputOptions("-c", "copy")
+            .outputOptions("-map", "0:v:0")
+            .outputOptions("-map", "1:a:0")
+            .save(outputPath)
+            .on("end", () => {
+            console.log("Output Video Created successfully");
+            resolve();
+        }).on("error", (err) => {
+            console.log(err);
+            reject();
+        });
     });
 }
 export async function convertSrtToText(srtFilePath) {
@@ -87,6 +103,29 @@ async function processConvertingSrtToText(srtPath, outputPath) {
             resolve();
         });
     });
+}
+async function processGetVideoDuration(videoPath) {
+    return new Promise((resolve, reject) => {
+        ffmpegfluent.ffprobe(videoPath, (err, metadata) => {
+            if (err) {
+                console.log(err);
+                reject();
+            }
+            else {
+                console.log("Processing finished");
+                if (typeof metadata.format.duration == undefined)
+                    reject();
+                resolve(metadata.format.duration);
+            }
+        });
+    });
+}
+export async function getVideoDuration(videoPath) {
+    let fullPath = "downloads/" + videoPath;
+    console.log("full path is" + fullPath);
+    let duration = await processGetVideoDuration(fullPath);
+    let retDuration = duration;
+    return retDuration;
 }
 //burnSubtitles("as");
 //combineAudioAndVideo();

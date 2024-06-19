@@ -8,7 +8,7 @@ export async function createCoin(query: string): Promise<string> {
     .insert(CoinTable)
     .values({
       idea: query,
-      userId: "900e3013-c38d-44be-8865-9088b0b40b78",
+      userId: "66fb9179-52f8-482c-8872-82bfa3bf3dc4",
     })
     .returning({
       id: CoinTable.id,
@@ -54,4 +54,8 @@ export async function insertResizedVideoPath(
     .update(CoinTable)
     .set({ subtitledVideo: resizedVideoPath })
     .where(eq(CoinTable.id, coinId));
+}
+
+export async function insertFinalVideoPath(coinId:string,finalVideoPath:string){
+  await db.update(CoinTable).set({finalVideoPath:finalVideoPath}).where(eq(CoinTable.id,coinId));
 }

@@ -7,8 +7,9 @@ import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
 import { getSrtFile } from "./util/geminiFolder/gemini.js";
 import { processBodySchema, } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
-import { createCoin, insertPexelsVideoPath, insertResizedVideoPath, insertScript, insertSearchTerms, insertSrtFilePath, } from "./drizzle/dbUtil/dbUtil.js";
-import { burnSubtitles, convertSrtToText, resizeVideo, } from "./util/ffmpegUtil/ffmpeg.js";
+import { createCoin, insertFinalVideoPath, insertPexelsVideoPath, insertResizedVideoPath, insertScript, insertSearchTerms, insertSrtFilePath, } from "./drizzle/dbUtil/dbUtil.js";
+import { burnSubtitles, combineAudioAndVideo, convertSrtToText, getVideoDuration, resizeVideo, } from "./util/ffmpegUtil/ffmpeg.js";
+import { textToSpeech } from "./util/gtts/gttsUtil.js";
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const corsOptions = {
@@ -37,11 +38,14 @@ app.get("/process", validateBody(processBodySchema), async (req, res) => {
     let videoLink = await getPexelsVideo(searchTerms[0]);
     //download Video
     let pexelsVideoPath = await downloadVideo(videoLink);
+    console.log("The pexels video path is " + pexelsVideoPath);
     //save the path to the db
     await insertPexelsVideoPath(coinId, pexelsVideoPath);
     //generate the srt file
+    let videoDuration = await getVideoDuration(pexelsVideoPath);
+    console.log("Video duration is", videoDuration);
     let fileName = pexelsVideoPath.slice(0, pexelsVideoPath.length - 4);
-    let srtFilePath = await getSrtFile(fileName, generatedScript);
+    let srtFilePath = await getSrtFile(fileName, generatedScript, videoDuration);
     console.log("The srtFiePath is " + srtFilePath);
     //insert the srt file path
     await insertSrtFilePath(coinId, srtFilePath);
@@ -59,10 +63,14 @@ app.get("/process", validateBody(processBodySchema), async (req, res) => {
     //generate text from subtitles
     let textFilePath = await convertSrtToText(srtFilePath);
     console.log(textFilePath);
-    // //generate audio from the textFile
-    // let audioFilePath = textToSpeech(textFilePath);
-    // console.log(audioFilePath);
-    res.json({ message: "Done" });
+    //generate audio from the textFile
+    let audioFilePath = await textToSpeech(textFilePath);
+    console.log("The aduioFilePath is", audioFilePath);
+    //combine audio with video files
+    let finalVideoPath = await combineAudioAndVideo(subtitledVideoPath, audioFilePath);
+    //insert the videoPath
+    insertFinalVideoPath(coinId, finalVideoPath);
+    res.json({ finalVideoPath });
 });
 app.listen(port, () => {
     console.log(`Listening on localhost:${port}`);
