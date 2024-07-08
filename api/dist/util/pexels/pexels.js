@@ -19,9 +19,15 @@ export async function downloadVideo(videoUrl) {
     let videoExtension = tempString[tempString.length - 1];
     let videoName = uuidString + "." + videoExtension;
     let path = "downloads/" + videoName;
-    const stream = fs.createWriteStream(path);
-    https.get(videoUrl, (response) => {
-        response.pipe(stream);
-    });
+    await processDownloadVideo(videoUrl, path);
     return videoName;
+}
+async function processDownloadVideo(videoUrl, path) {
+    return new Promise((resolve, reject) => {
+        const stream = fs.createWriteStream(path);
+        https.get(videoUrl, (response) => {
+            response.pipe(stream);
+            resolve();
+        });
+    });
 }

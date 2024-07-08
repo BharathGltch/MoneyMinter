@@ -38,14 +38,15 @@ export async function getJsonSearchTerms(
 
 export async function getSrtFile(
   srtFileName: string,
-  inputText: string
+  inputText: string,
+  duration:number
 ): Promise<string> {
   const prompt = `Generate an srt file for a given text  
     
 
     Only the srt file is to be returned. Dont give any other response like Certainly! or anything similar.
 
-    here is an example of a response:
+    here is an example of a response for a duration of 12 seconds:
     "1
     00:00:00,000 --> 00:00:06,000
     In Willow Creek, Ethan's life changed when he received a magic backpack from his sorceress aunt.
@@ -57,11 +58,12 @@ export async function getSrtFile(
     and so on
 
     It can have any number of lines but should be such that it is can get the maximum number of views for a youtube short.It should be like somebody is narrating the lines. It can be of any duration, but should be short enough to be uploaded to Youtube shorts.
-
+    It should also fit the duration provided.It has to fit the duration given with the content still being relevant.The duration will be given in seconds.It is not necessary that the first text fo the full duration. The broken down components summed should be of the duration given.
+    It should exactly match the duration change the text around but keeping the theme same.
 
     ONLY return the srt file.
     Do not return anything else
-    here is the full text "${inputText}"
+    here is the full text "${inputText}" and the duration is "${duration}"
     `;
 
   const result = await model.generateContent(prompt);

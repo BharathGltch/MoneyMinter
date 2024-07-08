@@ -55,3 +55,7 @@ export async function insertResizedVideoPath(
     .set({ subtitledVideo: resizedVideoPath })
     .where(eq(CoinTable.id, coinId));
 }
+
+export async function insertFinalVideoPath(coinId:string,finalVideoPath:string){
+  await db.update(CoinTable).set({finalVideoPath:finalVideoPath}).where(eq(CoinTable.id,coinId));
+}

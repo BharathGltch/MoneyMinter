@@ -19,16 +19,24 @@ export async function getPexelsVideo(searchTerm: string): Promise<string> {
   return videoUrl;
 }
 
-export async function downloadVideo(videoUrl: string): Promise<string> {
+export async function downloadVideo(videoUrl: string) {
   let uuidString = uuidv4();
   let tempString = videoUrl.split(".");
   let videoExtension = tempString[tempString.length - 1];
   let videoName = uuidString + "." + videoExtension;
   let path = "downloads/" + videoName;
-  const stream = fs.createWriteStream(path);
-
-  https.get(videoUrl, (response) => {
-    response.pipe(stream);
-  });
+   await processDownloadVideo(videoUrl,path);
   return videoName;
+}
+
+async function processDownloadVideo(videoUrl:string,path:string):Promise<void>{
+
+  return new Promise((resolve,reject)=>{
+    const stream = fs.createWriteStream(path);
+    https.get(videoUrl,(response)=>{
+      response.pipe(stream);
+      resolve();
+  })
+  })
+ 
 }
