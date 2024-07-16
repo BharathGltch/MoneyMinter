@@ -3,7 +3,7 @@ import GenVideo from "./GenVideo";
 
 export default function Home(){
     return(
-        <div className="w-screen h-dvh bg-[#EEEEEE]">
+        <div className="w-screen h-full bg-[#EEEEEE]">
         <div className="mx-40">
           <div className="flex pt-[100px]">
             <ChangingText/> 

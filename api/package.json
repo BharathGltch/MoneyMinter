@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@google/generative-ai": "^0.8.0",
+    "@types/jsonwebtoken": "^9.0.6",
     "axios": "^1.6.8",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -22,6 +23,7 @@
     "ffprobe-static": "^3.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "gtts": "^0.2.1",
+    "jsonwebtoken": "^9.0.2",
     "openai": "^4.38.5",
     "pg": "^8.11.5",
     "postgres": "^3.4.4",
