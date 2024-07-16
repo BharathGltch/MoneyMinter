@@ -1,10 +1,10 @@
 import { serial } from "drizzle-orm/mysql-core";
-import { pgTable, uuid, varchar,text } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar,text, boolean } from "drizzle-orm/pg-core";
 
 export const UserTable = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
-  
+  registeredUser:boolean("registereduser").notNull()
 });
 
 export const CoinTable=pgTable("coin",{

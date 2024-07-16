@@ -9,8 +9,7 @@ export default function auth(req:Request,res:Response,next:NextFunction){
     let authToken=req.headers['authorization'];
     if(!authToken){
         let tempUserId=uuidv4();
-       let token= jwt.sign({userId:tempUserId,loggeedIn:false},JwtSecret,{expiresIn:60*10});
-        res.setHeader('token',token);
+        let token= jwt.sign({userId:tempUserId,loggeedIn:false},JwtSecret,{expiresIn:60*10});
         next();
     }else{
         

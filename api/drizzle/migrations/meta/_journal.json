@@ -15,6 +15,13 @@
       "when": 1717051125626,
       "tag": "0001_tricky_terrax",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1721141379887,
+      "tag": "0002_silky_avengers",
+      "breakpoints": true
     }
   ]
 }
