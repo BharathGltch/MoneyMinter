@@ -1,4 +1,3 @@
-import { serial } from "drizzle-orm/mysql-core";
 import { pgTable, uuid, varchar,text, boolean } from "drizzle-orm/pg-core";
 
 export const UserTable = pgTable("user", {

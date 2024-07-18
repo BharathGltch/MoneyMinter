@@ -8,7 +8,7 @@ export async function createCoin(query: string): Promise<string> {
     .insert(CoinTable)
     .values({
       idea: query,
-      userId: "900e3013-c38d-44be-8865-9088b0b40b78",
+      userId: "99415575-834b-4829-9ec2-3552491fba91",
     })
     .returning({
       id: CoinTable.id,
