@@ -69,6 +69,8 @@ app.get("/video/:videoId",videoReqAuth,(expressRequest,_res)=>{
       if(req.userId==null)
        return _res.status(400).json({"message":"No userId"});
       
+
+     
       _res.status(200).json({userId: req.userId});
       
 })

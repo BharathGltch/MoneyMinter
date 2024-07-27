@@ -15,19 +15,24 @@ export interface MyJwtPayload extends JwtPayload{
 
 export  function videoReqAuth(req:Request,res:Response,next:NextFunction){
     
+    let videoId=req.params.videoId;
+    if(!videoId){
+        res.status(404).json({message:"No videoId"});
+    }
+
     let authToken=req.headers['authorization'];
     if(!authToken){
-        let tempUserId=uuidv4();
-        (req as CustomRequest).userId=tempUserId;
-       let token= jwt.sign({userId:tempUserId,loggeedIn:false},JwtSecret,{expiresIn:60*10});
-        res.setHeader('token',token);
-
-        next();
+       res.status(401).json({message:"You are not authorized"});
+       
     }else{
         try{
         let token=authToken.split(" ")[1];
         let decoded=jwt.verify(token,JwtSecret) as MyJwtPayload;
+        
         if(decoded && typeof decoded.userId=="string"){
+            //check if the userId and videoId match
+            
+
         (req as CustomRequest).userId=decoded.userId;
         next();
         }else{
@@ -48,7 +53,7 @@ export function checkAndGiveUserId(req:Request,res:Response,next:NextFunction){
    if(!authToken){
     let tempUserId=uuidv4();
     (req as CustomRequest).userId=tempUserId;
-   let token= jwt.sign({userId:tempUserId,loggeedIn:false},JwtSecret,{expiresIn:60*10});
+   let token= jwt.sign({userId:tempUserId,loggedIn:false},JwtSecret,{expiresIn:60*10});
     res.setHeader('token',token);
     next();
    }else{
