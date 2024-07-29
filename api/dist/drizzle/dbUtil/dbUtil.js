@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../db.js";
 import { CoinTable } from "../schema.js";
 export async function createCoin(query) {
@@ -45,4 +45,14 @@ export async function insertResizedVideoPath(coinId, resizedVideoPath) {
 }
 export async function insertFinalVideoPath(coinId, finalVideoPath) {
     await db.update(CoinTable).set({ finalVideoPath: finalVideoPath }).where(eq(CoinTable.id, coinId));
+}
+export async function checkIfUserOwnsVideo(videoId, userId) {
+    const results = await db
+        .select()
+        .from(CoinTable)
+        .where(and(eq(CoinTable.id, videoId), eq(CoinTable.userId, userId)));
+    if (results.length == 0) {
+        return false;
+    }
+    return true;
 }

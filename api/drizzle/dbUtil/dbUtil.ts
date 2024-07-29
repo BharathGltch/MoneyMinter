@@ -67,5 +67,10 @@ export async function checkIfUserOwnsVideo(videoId:string,userId:string){
   .where(
     and(eq(CoinTable.id,videoId),eq(CoinTable.userId,userId))
   );
+  if(results.length==0){
+    return false;
+  }
+  return true;
+
 
 }
