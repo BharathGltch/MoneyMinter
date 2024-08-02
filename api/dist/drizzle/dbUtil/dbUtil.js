@@ -56,3 +56,11 @@ export async function checkIfUserOwnsVideo(videoId, userId) {
     }
     return true;
 }
+export async function getVideoPath(coinId) {
+    const result = await db.
+        select({ field1: CoinTable.finalVideoPath })
+        .from(CoinTable)
+        .where(eq(CoinTable.id, coinId))
+        .limit(1);
+    return result;
+}

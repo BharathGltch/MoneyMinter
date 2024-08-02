@@ -74,3 +74,12 @@ export async function checkIfUserOwnsVideo(videoId:string,userId:string){
 
 
 }
+
+export async function getVideoPath(coinId:string){
+  const result=await db.
+  select({id:CoinTable.finalVideoPath})
+  .from(CoinTable)
+  .where(eq(CoinTable.id,coinId))
+  .limit(1);
+  return result;
+}

@@ -17,6 +17,7 @@ import { validateBody } from "./middleware/index.js";
 import { db } from "./drizzle/db.js";
 import {
   createCoin,
+  getVideoPath,
   insertFinalVideoPath,
   insertPexelsVideoPath,
   insertResizedVideoPath,
@@ -64,13 +65,25 @@ app.post(
   }
 );
 
-app.get("/video/:videoId",videoReqAuth,(expressRequest,_res)=>{
+app.get("/video/:videoId",videoReqAuth,async (expressRequest,_res)=>{
       const req=expressRequest as CustomRequest;
       if(req.userId==null)
        return _res.status(400).json({"message":"No userId"});
            
-      _res.status(200).json({userId: req.userId});
+      //req.userId to access the userId
+      //get the file url from the coinId in the db coin table
+      let coinId=req.params["videoId"];
+
+      let videoPath=await getVideoPath(coinId);
+      if(videoPath.length==0)
+        return _res.status(400).json({message:"Video Not Found"});
+      if(videoPath[0].id==null)
+        return _res.status(400).json({message:"Video Not Found"});
+      let videoPathFinal=videoPath[0].id;
       
+
+      
+
 })
 
 app.listen(port, () => {

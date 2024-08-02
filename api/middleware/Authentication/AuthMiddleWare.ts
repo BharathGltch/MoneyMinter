@@ -29,7 +29,9 @@ export async function videoReqAuth(req:Request,res:Response,next:NextFunction){
     }else{
         try{
         let token=authToken.split(" ")[1];
+        
         let decoded=jwt.verify(token,JwtSecret) as MyJwtPayload;
+        console.log("decoed is",decoded);
         
         if(decoded && typeof decoded.userId=="string"){
             //check if the userId and videoId match

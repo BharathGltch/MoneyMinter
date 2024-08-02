@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { processBodySchema, } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
+import { getVideoPath, } from "./drizzle/dbUtil/dbUtil.js";
 import processRequest from "./util/processUtil/processUtil.js";
 import { videoReqAuth, checkAndGiveUserId } from "./middleware/Authentication/AuthMiddleWare.js";
 dotenv.config();
@@ -24,11 +25,19 @@ app.post("/process", validateBody(processBodySchema), checkAndGiveUserId, async 
     let finalVideoPath = await processRequest(query);
     res.json({ finalVideoPath });
 });
-app.get("/video/:videoId", videoReqAuth, (expressRequest, _res) => {
+app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
     const req = expressRequest;
     if (req.userId == null)
         return _res.status(400).json({ "message": "No userId" });
-    _res.status(200).json({ userId: req.userId });
+    //req.userId to access the userId
+    //get the file url from the coinId in the db coin table
+    let coinId = req.params["videoId"];
+    let videoPath = await getVideoPath(coinId);
+    if (videoPath.length == 0)
+        return _res.status(400).json({ message: "Video Not Found" });
+    if (videoPath[0].field1 == null)
+        return _res.status(400).json({ message: "Video Not Found" });
+    let videoPathFinal = videoPath[0].field1;
 });
 app.listen(port, () => {
     console.log(`Listening on localhost:${port}`);
