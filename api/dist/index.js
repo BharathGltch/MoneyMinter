@@ -70,6 +70,41 @@ app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
         fs.createReadStream(filePath).pipe(_res);
     }
 });
+app.get("/videos", (req, _res) => {
+    let filePath = "downloads/demo.mp4";
+    const stat = fs.statSync(filePath);
+    console.log(JSON.stringify(stat));
+    const fileSize = stat.size;
+    const range = req.headers.range;
+    console.log("range is", range);
+    //get the parts fro the range
+    if (range) {
+        const parts = range.replace('bytes=', '').split("-");
+        console.log("parts ", parts);
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        console.log("start ", start);
+        const chunkSize = end - start + 1;
+        const file = fs.createReadStream(filePath, { start, end });
+        const head = {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunkSize,
+            'Content-Type': 'video/mp4'
+        };
+        _res.writeHead(206, head);
+        file.pipe(_res);
+        return;
+    }
+    else {
+        const head = {
+            'Content-Length': fileSize,
+            'Content-Type': 'video/mp4'
+        };
+        _res.writeHead(200, head);
+        fs.createReadStream(filePath).pipe(_res);
+    }
+});
 app.listen(port, () => {
     console.log(`Listening on localhost:${port}`);
 });
