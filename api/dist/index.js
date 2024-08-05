@@ -71,6 +71,7 @@ app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
     }
 });
 app.get("/videos", (req, _res) => {
+    console.log(req.headers["authorization"]);
     let filePath = "downloads/demo.mp4";
     const stat = fs.statSync(filePath);
     console.log(JSON.stringify(stat));
