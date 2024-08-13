@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "npx drizzle-kit generate",
-    "db:drop": "npx drizzle-kit drop"
+    "db:drop": "npx drizzle-kit drop",
+    "runapp":"npx tsc && node dist/index"
   },
   "keywords": [],
   "author": "",

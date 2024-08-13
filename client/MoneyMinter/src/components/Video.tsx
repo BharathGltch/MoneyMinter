@@ -35,6 +35,8 @@ export default function Video(){
         <ReactPlayer
         controls
         url={url}
+        width={230}
+        height={1280}
         config={{
                 file: {
                   hlsOptions: {

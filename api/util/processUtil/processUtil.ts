@@ -1,5 +1,5 @@
 import { createCoin, insertFinalVideoPath, insertPexelsVideoPath, insertResizedVideoPath, insertScript, insertSearchTerms, insertSrtFilePath } from "../../drizzle/dbUtil/dbUtil.js";
-import { burnSubtitles, combineAudioAndVideo, convertSrtToText, getVideoDuration, resizeVideo } from "../ffmpegUtil/ffmpeg.js";
+import { burnSubtitles, combineAudioAndVideo, convertSrtToText, cutVideo, getVideoDuration, resizeVideo } from "../ffmpegUtil/ffmpeg.js";
 import { generateScript, getJsonSearchTerms, getSrtFile } from "../geminiFolder/gemini.js";
 import { textToSpeech } from "../gtts/gttsUtil.js";
 import { downloadVideo, getPexelsVideo } from "../pexels/pexels.js";
@@ -18,11 +18,18 @@ export default async function processRequest(query:string){
     let videoLink = await getPexelsVideo(searchTerms[0]);
     //download Video
     let pexelsVideoPath = await downloadVideo(videoLink);
-    console.log("The pexels video path is "+pexelsVideoPath);
+    console.log("The pexels video path after downloading is "+pexelsVideoPath);
     //save the path to the db
     await insertPexelsVideoPath(coinId, pexelsVideoPath);
+    console.log("Inserted Pexel Video Path");
     //generate the srt file
-    let videoDuration=await  getVideoDuration(pexelsVideoPath);
+    let videoDuration=await getVideoDuration(pexelsVideoPath);
+    if(videoDuration>30){
+      console.log("Inside cut video\n");
+        pexelsVideoPath=await cutVideo(pexelsVideoPath);
+        console.log("Outside cut video\n");
+
+    }
     console.log("Video duration is",videoDuration);
 
     let fileName = pexelsVideoPath.slice(0, pexelsVideoPath.length - 4);
@@ -53,7 +60,7 @@ export default async function processRequest(query:string){
 
     //generate audio from the textFile
      let audioFilePath =await textToSpeech(textFilePath);
-     console.log ("The aduioFilePath is", audioFilePath);
+     console.log ("The audioFilePath is", audioFilePath);
       
      //combine audio with video files
      let finalVideoPath=await combineAudioAndVideo(subtitledVideoPath,audioFilePath);

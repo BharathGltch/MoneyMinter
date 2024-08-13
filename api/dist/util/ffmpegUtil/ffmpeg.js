@@ -105,16 +105,19 @@ async function processConvertingSrtToText(srtPath, outputPath) {
     });
 }
 async function processGetVideoDuration(videoPath) {
+    console.log(videoPath, " in processGetVideoDuration");
     return new Promise((resolve, reject) => {
         ffmpegfluent.ffprobe(videoPath, (err, metadata) => {
             if (err) {
-                console.log(err);
+                console.log(err, "At processGetVideoDuration");
                 reject();
             }
             else {
                 console.log("Processing finished");
-                if (typeof metadata.format.duration == undefined)
+                if (typeof metadata.format.duration == undefined) {
+                    console.log("Metadata is  nor formatted correctly in getting video Duration");
                     reject();
+                }
                 resolve(metadata.format.duration);
             }
         });
@@ -126,6 +129,46 @@ export async function getVideoDuration(videoPath) {
     let duration = await processGetVideoDuration(fullPath);
     let retDuration = duration;
     return retDuration;
+}
+export async function cutVideo(videoPath) {
+    let videoName = videoPath.slice(0, videoPath.length - 4);
+    console.log("videoName is ", videoName);
+    let outputPath = videoName + "cutVideo" + ".mp4";
+    console.log("outpt Path is", outputPath);
+    await processCuttingVideo("downloads/" + videoPath, "downloads/" + outputPath);
+    return outputPath;
+}
+async function processCuttingVideo(videoPath, outputPath) {
+    try {
+        return new Promise((resolve, reject) => {
+            console.log("Path inside the Promise is", videoPath);
+            ffmpegfluent(videoPath)
+                .output(outputPath)
+                .setStartTime(0)
+                .setDuration(30)
+                .withVideoCodec('copy')
+                .withAudioCodec('copy')
+                .on('end', function (err) {
+                if (!err) {
+                    console.log("Cuting done");
+                    resolve();
+                }
+            })
+                .on('error', function (err) {
+                console.log('error:', err);
+                reject(err);
+            })
+                .run();
+        });
+    }
+    catch (e) {
+        if (typeof e === "string") {
+            e.toUpperCase(); // works, `e` narrowed to string
+        }
+        else if (e instanceof Error) {
+            e.message; // works, `e` narrowed to Error
+        }
+    }
 }
 //burnSubtitles("as");
 //combineAudioAndVideo();
