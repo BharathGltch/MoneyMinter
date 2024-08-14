@@ -1,0 +1,135 @@
+{
+  "id": "d5cfee2e-2b6e-4e59-8c7d-811b4fc2ffe7",
+  "prevId": "7f7876a6-3d58-40d5-9722-454a9299093c",
+  "version": "6",
+  "dialect": "postgresql",
+  "tables": {
+    "public.coin": {
+      "name": "coin",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "idea": {
+          "name": "idea",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "searchTerms": {
+          "name": "searchTerms",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pexelVideo": {
+          "name": "pexelVideo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "srtFilePath": {
+          "name": "srtFilePath",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subtitledVideo": {
+          "name": "subtitledVideo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "audioPath": {
+          "name": "audioPath",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finalVideoPath": {
+          "name": "finalVideoPath",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "coin_userId_user_id_fk": {
+          "name": "coin_userId_user_id_fk",
+          "tableFrom": "coin",
+          "tableTo": "user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registereduser": {
+          "name": "registereduser",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

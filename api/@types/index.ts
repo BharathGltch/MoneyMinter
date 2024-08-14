@@ -11,3 +11,24 @@ export interface ProcessBody{
 export const processBodySchema=z.object({
   queryString:z.string()
 })
+
+export const processLoginBody=z.object({
+  username:z.string(),
+  password:z.string()
+})
+
+export const processRegisterBodySchema=z.object({
+  username:z.string(),
+  password:z.string()
+})
+
+
+export type LoginRequestBody={
+    username:string,
+    password:string
+}
+
+export type RegisterRequestBody={
+  username:string,
+  password:string
+}

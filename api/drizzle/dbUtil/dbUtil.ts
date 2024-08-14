@@ -1,7 +1,7 @@
 import { eq,and} from "drizzle-orm";
 import { string } from "zod";
 import { db } from "../db.js";
-import { CoinTable } from "../schema.js";
+import { CoinTable, UserTable } from "../schema.js";
 
 export async function createCoin(query: string): Promise<string> {
   const coin = await db
@@ -82,4 +82,26 @@ export async function getVideoPath(coinId:string){
   .where(eq(CoinTable.id,coinId))
   .limit(1);
   return result;
+}
+
+
+export async function registerUser(username:string,password:string):Promise<string>{
+ let id= await db.insert(UserTable).values({
+    name:username,
+    registeredUser:true,
+    password:password
+  })
+  .returning({
+    id:UserTable.id
+  })
+  return id[0].id;
+}
+
+export async function usernameIsPresent(username:string){
+  let record=await db.query.UserTable.findFirst({
+    where:eq(UserTable.id,username)
+  })
+  if(!record)
+    return true;
+  return false;
 }

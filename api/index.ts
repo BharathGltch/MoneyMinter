@@ -13,6 +13,7 @@ import {
   TypedRequestBody,
   ProcessBody,
   processBodySchema,
+  processLoginBody,
 } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
 import { db } from "./drizzle/db.js";
@@ -164,6 +165,13 @@ app.get("/videos",(req,_res)=>{
      
   }
 })
+
+app.post("/login",validateBody(processLoginBody), (req,res)=>{
+
+})  
+
+
+
 
 app.listen(port, () => {
   console.log(`Listening on localhost:${port}`);
