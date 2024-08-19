@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../db.js";
-import { CoinTable } from "../schema.js";
+import { CoinTable, UserTable } from "../schema.js";
 export async function createCoin(query) {
     const coin = await db
         .insert(CoinTable)
@@ -57,10 +57,36 @@ export async function checkIfUserOwnsVideo(videoId, userId) {
     return true;
 }
 export async function getVideoPath(coinId) {
-    const result = await db.
-        select({ id: CoinTable.finalVideoPath })
-        .from(CoinTable)
-        .where(eq(CoinTable.id, coinId))
-        .limit(1);
+    const result = await db.query.CoinTable.findFirst({
+        where: eq(CoinTable.id, coinId),
+        columns: {
+            finalVideoPath: true
+        }
+    });
     return result;
+}
+export async function registerUser(username, password) {
+    let id = await db.insert(UserTable).values({
+        name: username,
+        registeredUser: true,
+        password: password
+    })
+        .returning({
+        id: UserTable.id
+    });
+    return id[0].id;
+}
+export async function usernameIsPresent(username) {
+    let record = await db.query.UserTable.findFirst({
+        where: eq(UserTable.name, username)
+    });
+    if (record)
+        return true;
+    return false;
+}
+export async function recordWithUsername(username) {
+    let record = await db.query.UserTable.findFirst({
+        where: eq(UserTable.name, username)
+    });
+    return record;
 }

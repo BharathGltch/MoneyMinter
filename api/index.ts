@@ -37,6 +37,7 @@ import {
 import { textToSpeech } from "./util/gtts/gttsUtil.js";
 import processRequest from "./util/processUtil/processUtil.js";
 import {videoReqAuth, checkAndGiveUserId, CustomRequest } from "./middleware/Authentication/AuthMiddleWare.js";
+import loginRouter from "./routers/loginRouter.js";
 
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -77,13 +78,12 @@ app.get("/video/:videoId",videoReqAuth,async (expressRequest,_res)=>{
       let coinId=req.params["videoId"];
 
       let videoPath=await getVideoPath(coinId);
-      if(videoPath.length==0)
+      if(videoPath==undefined)
         return _res.status(400).json({message:"Video Not Found"});
-      if(videoPath[0].id==null)
+      if(videoPath.finalVideoPath==undefined)
         return _res.status(400).json({message:"Video Not Found"});
-      let videoPathFinal=videoPath[0].id;
-       videoPathFinal="downloads/demo.mp4";
-       let filePath=videoPathFinal;
+      let videoPathFinal=videoPath.finalVideoPath;
+      let filePath=videoPathFinal;
 
       const stat=fs.statSync(filePath);
       const fileSize=stat.size;
@@ -166,9 +166,9 @@ app.get("/videos",(req,_res)=>{
   }
 })
 
-app.post("/login",validateBody(processLoginBody), (req,res)=>{
+ 
 
-})  
+app.use("/",loginRouter);
 
 
 

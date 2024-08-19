@@ -2,11 +2,13 @@ import { Button, TextField } from "@mui/material"
 import { useState } from "react"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ClipLoader } from "react-spinners";
 
 export default function GenVideo(){
     const [idea,setIdea]=useState("");
     const [error,setError]=useState(false);
     const [helperText,setHelperText]=useState("");
+    const [isLoading,setIsLoading]=useState(false);
 
     const handleButtonClick=()=>{
         if(idea.length==0){
@@ -16,13 +18,21 @@ export default function GenVideo(){
             let formData={
                 "queryString":idea
             };
+            setIsLoading(true);
              axios.post("http://localhost:3000/process",formData)
              .then(response=>{
-                console.log("Response: ",response.data)
+                setIsLoading(false);
+                console.log("Response: ",response.data);
              }).catch(error=>{
+                setIsLoading(false);
                 console.log("Error ",error);
              })
         }
+    }
+    if(isLoading){
+        return(
+                <ClipLoader />
+        )
     }
     return(
         <div className="w-full">

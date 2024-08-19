@@ -76,11 +76,12 @@ export async function checkIfUserOwnsVideo(videoId:string,userId:string){
 }
 
 export async function getVideoPath(coinId:string){
-  const result=await db.
-  select({id:CoinTable.finalVideoPath})
-  .from(CoinTable)
-  .where(eq(CoinTable.id,coinId))
-  .limit(1);
+  const result=await db.query.CoinTable.findFirst({
+    where:eq(CoinTable.id,coinId),
+    columns:{
+      finalVideoPath:true
+    }
+  })
   return result;
 }
 
@@ -99,9 +100,16 @@ export async function registerUser(username:string,password:string):Promise<stri
 
 export async function usernameIsPresent(username:string){
   let record=await db.query.UserTable.findFirst({
-    where:eq(UserTable.id,username)
+    where:eq(UserTable.name,username)
   })
-  if(!record)
+  if(record)
     return true;
   return false;
+}
+
+export async function recordWithUsername(username:string){
+  let record=await db.query.UserTable.findFirst({
+    where:eq(UserTable.name,username)
+  })
+  return record;
 }
