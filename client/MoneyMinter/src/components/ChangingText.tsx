@@ -7,7 +7,7 @@ export default function ChangingText(){
     let text=textArray[0];
     let length=1;
     let index=0;
-    let typingInterval:number|null=null;
+    let typingInterval:NodeJS.Timeout|null=null;
     
     const changeTextTime=()=>{
         
