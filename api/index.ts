@@ -3,28 +3,19 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
-
 import {
   TypedRequestBody,
   processBodySchema,
-  
+
 } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
 import {
-  createCoin,
+
   getVideoPath,
-  insertFinalVideoPath,
-  insertPexelsVideoPath,
-  insertResizedVideoPath,
-  insertScript,
-  insertSearchTerms,
-  insertSrtFilePath,
+
 } from "./drizzle/dbUtil/dbUtil.js";
-import jwt, { JwtPayload } from "jsonwebtoken";
-
-
 import processRequest from "./util/processUtil/processUtil.js";
-import {videoReqAuth, checkAndGiveUserId, CustomRequest } from "./middleware/Authentication/AuthMiddleWare.js";
+import { videoReqAuth, checkAndGiveUserId, CustomRequest } from "./middleware/Authentication/AuthMiddleWare.js";
 import loginRouter from "./routers/loginRouter.js";
 
 dotenv.config();
@@ -48,121 +39,121 @@ app.post(
   "/process",
   validateBody(processBodySchema),
   checkAndGiveUserId,
-  async (req: TypedRequestBody<{token:string, queryString: string }>, res) => {
-    let cusReq=req as CustomRequest;
+  async (req: TypedRequestBody<{ token: string, queryString: string }>, res) => {
+    let cusReq = req as CustomRequest;
     let query = req.body.queryString;
-    let userId=cusReq.userId;
+    let userId = cusReq.userId;
     console.log("The query is " + query);
-    let videoId=await processRequest(query,userId);
-    res.json({token:cusReq.token, videoId });
+    let videoId = await processRequest(query, userId);
+    res.json({ token: cusReq.token, videoId });
   }
 );
 
-app.get("/video/:videoId",videoReqAuth,async (expressRequest,_res)=>{
-      const req=expressRequest as CustomRequest;
-      if(req.userId==null)
-       return _res.status(400).json({"message":"No userId"});
-           
-      //req.userId to access the userId
-      //get the file url from the coinId in the db coin table
-      let coinId=req.params["videoId"];
-      
+app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
+  const req = expressRequest as CustomRequest;
+  if (req.userId == null)
+    return _res.status(400).json({ "message": "No userId" });
 
-      let videoPath=await getVideoPath(coinId);
-      console.log("The video Path is ",videoPath);
-      if(videoPath==undefined)
-        return _res.status(400).json({message:"Video Not Found"});
-      if(videoPath.finalVideoPath==undefined)
-        return _res.status(400).json({message:"Video Not Found"});
-      let videoPathFinal=videoPath.finalVideoPath;
-      let filePath=videoPathFinal;
-
-      const stat=fs.statSync(filePath);
-      const fileSize=stat.size;
-      const range=req.headers.range;
-
-      //get the parts fro the range
+  //req.userId to access the userId
+  //get the file url from the coinId in the db coin table
+  let coinId = req.params["videoId"];
 
 
-      if(range){
-          const parts=range.replace('/bytes=/','').split("-");
-          const start=parseInt(parts[0],10);
-          const end=parts[1]? parseInt(parts[1],10):fileSize-1;
+  let videoPath = await getVideoPath(coinId);
+  console.log("The video Path is ", videoPath);
+  if (videoPath == undefined)
+    return _res.status(400).json({ message: "Video Not Found" });
+  if (videoPath.finalVideoPath == undefined)
+    return _res.status(400).json({ message: "Video Not Found" });
+  let videoPathFinal = videoPath.finalVideoPath;
+  let filePath = videoPathFinal;
 
-          const chunkSize=end-start+1;
-          const file=fs.createReadStream(filePath,{start,end});
-          const head={
-            'Content-Range':`bytes ${start}-${end}/${fileSize}`,
-            'Accept-Ranges':'bytes',
-            'Content-Length':chunkSize,
-            'Content-Type':'video/mp4'
-
-          };
-          _res.writeHead(206,head);
-          file.pipe(_res);
-          return;
-         
-      }else{
-          const head={
-            'Content-Length':fileSize,
-            'Content-Type':'video/mp4'
-          }
-          _res.writeHead(200,head);
-           fs.createReadStream(filePath).pipe(_res);
-         
-      }
-
-})
-
-app.get("/videos",(req,_res)=>{
-  //console.log(JSON.stringify(req.headers.authorization));
-  console.log("The authorization header is ",req.headers["random"]);
- 
-  let filePath="downloads/demo.mp4";
-
-  const stat=fs.statSync(filePath);
-   //console.log(JSON.stringify(stat));
-  const fileSize=stat.size;
-  const range=req.headers.range;
-  console.log("range is",range);
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
 
   //get the parts fro the range
 
 
-  if(range){
-      const parts=range.replace('bytes=','').split("-");
-      console.log("parts ",parts);
-      const start=parseInt(parts[0],10);
-      const end=parts[1]? parseInt(parts[1],10):fileSize-1;
-      console.log("start ",start);
+  if (range) {
+    const parts = range.replace('/bytes=/', '').split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
-      const chunkSize=end-start+1;
-      const file=fs.createReadStream(filePath,{start,end});
-      const head={
-        'Content-Range':`bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges':'bytes',
-        'Content-Length':chunkSize,
-        'Content-Type':'video/mp4'
+    const chunkSize = end - start + 1;
+    const file = fs.createReadStream(filePath, { start, end });
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunkSize,
+      'Content-Type': 'video/mp4'
 
-      };
-      _res.writeHead(206,head);
-      file.pipe(_res);
-      return;
-     
-  }else{
-      const head={
-        'Content-Length':fileSize,
-        'Content-Type':'video/mp4'
-      }
-      _res.writeHead(200,head);
-       fs.createReadStream(filePath).pipe(_res);
+    };
+    _res.writeHead(206, head);
+    file.pipe(_res);
+    return;
+
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4'
+    }
+    _res.writeHead(200, head);
+    fs.createReadStream(filePath).pipe(_res);
+
+  }
+
+})
+
+app.get("/videos", (req, _res) => {
+  //console.log(JSON.stringify(req.headers.authorization));
+  console.log("The authorization header is ", req.headers["random"]);
+
+  let filePath = "downloads/demo.mp4";
+
+  const stat = fs.statSync(filePath);
+  //console.log(JSON.stringify(stat));
+  const fileSize = stat.size;
+  const range = req.headers.range;
+  console.log("range is", range);
+
+  //get the parts fro the range
+
+
+  if (range) {
+    const parts = range.replace('bytes=', '').split("-");
+    console.log("parts ", parts);
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+    console.log("start ", start);
+
+    const chunkSize = end - start + 1;
+    const file = fs.createReadStream(filePath, { start, end });
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunkSize,
+      'Content-Type': 'video/mp4'
+
+    };
+    _res.writeHead(206, head);
+    file.pipe(_res);
+    return;
+
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4'
+    }
+    _res.writeHead(200, head);
+    fs.createReadStream(filePath).pipe(_res);
   }
 })
 
 
- 
 
-app.use("/",loginRouter);
+
+app.use("/", loginRouter);
 
 
 

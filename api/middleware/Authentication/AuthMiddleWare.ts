@@ -1,4 +1,4 @@
-import  {v4 as uuidv4} from 'uuid';
+
 import jwt, { JwtPayload } from "jsonwebtoken";
 import {Request,Response, NextFunction } from "express";
 import dotenv from "dotenv";
@@ -20,7 +20,7 @@ export async function videoReqAuth(req:Request,res:Response,next:NextFunction){
     let videoId=req.params.videoId;
     console.log("videoId is",videoId);
     if(!videoId){
-        res.status(404).json({message:"No videoId"});
+       return res.status(404).json({message:"No videoId"});
     }
     console.log("The headers are",req.headers);
     let authToken=req.headers["authorization"];
