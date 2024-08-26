@@ -10,6 +10,8 @@ export default function GenVideo(){
     const [helperText,setHelperText]=useState("");
     const [isLoading,setIsLoading]=useState(false);
 
+    const navigate=useNavigate();
+
     const handleButtonClick=()=>{
         if(idea.length==0){
             setError(true);
@@ -22,6 +24,9 @@ export default function GenVideo(){
              axios.post("http://localhost:3000/process",formData)
              .then(response=>{
                 setIsLoading(false);
+                localStorage.setItem("token",response.data.token);
+                let videoId=response.data.videoId as string;
+                navigate(`/video/${videoId}`);
                 console.log("Response: ",response.data);
              }).catch(error=>{
                 setIsLoading(false);

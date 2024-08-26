@@ -4,8 +4,8 @@ import { generateScript, getJsonSearchTerms, getSrtFile } from "../geminiFolder/
 import { textToSpeech } from "../gtts/gttsUtil.js";
 import { downloadVideo, getPexelsVideo } from "../pexels/pexels.js";
 
-export default async function processRequest(query:string){
-    let coinId = await createCoin(query);
+export default async function processRequest(query:string,userId:string){
+    let coinId = await createCoin(query,userId);
     //generate the script
     let generatedScript = await generateScript(query);
     //Insert Script into Table
@@ -66,5 +66,5 @@ export default async function processRequest(query:string){
      let finalVideoPath=await combineAudioAndVideo(subtitledVideoPath,audioFilePath);
       //insert the videoPath
       insertFinalVideoPath(coinId,finalVideoPath);
-      return finalVideoPath;
+      return coinId;
 } 

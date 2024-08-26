@@ -3,12 +3,12 @@ import { string } from "zod";
 import { db } from "../db.js";
 import { CoinTable, UserTable } from "../schema.js";
 
-export async function createCoin(query: string): Promise<string> {
+export async function createCoin(query: string,userId:string): Promise<string> {
   const coin = await db
     .insert(CoinTable)
     .values({
       idea: query,
-      userId: "99415575-834b-4829-9ec2-3552491fba91",
+      userId: userId,
     })
     .returning({
       id: CoinTable.id,
@@ -96,6 +96,17 @@ export async function registerUser(username:string,password:string):Promise<stri
     id:UserTable.id
   })
   return id[0].id;
+}
+
+export const registerTemporaryUser=async ()=>{
+  let id=await db.insert(UserTable).values({
+    name:"Temp",
+    registeredUser:false
+  })
+  .returning({
+    id:UserTable.id
+  });
+  return id[0].id
 }
 
 export async function usernameIsPresent(username:string){

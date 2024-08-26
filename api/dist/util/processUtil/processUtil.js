@@ -3,8 +3,8 @@ import { burnSubtitles, combineAudioAndVideo, convertSrtToText, cutVideo, getVid
 import { generateScript, getJsonSearchTerms, getSrtFile } from "../geminiFolder/gemini.js";
 import { textToSpeech } from "../gtts/gttsUtil.js";
 import { downloadVideo, getPexelsVideo } from "../pexels/pexels.js";
-export default async function processRequest(query) {
-    let coinId = await createCoin(query);
+export default async function processRequest(query, userId) {
+    let coinId = await createCoin(query, userId);
     //generate the script
     let generatedScript = await generateScript(query);
     //Insert Script into Table
@@ -55,5 +55,5 @@ export default async function processRequest(query) {
     let finalVideoPath = await combineAudioAndVideo(subtitledVideoPath, audioFilePath);
     //insert the videoPath
     insertFinalVideoPath(coinId, finalVideoPath);
-    return finalVideoPath;
+    return coinId;
 }

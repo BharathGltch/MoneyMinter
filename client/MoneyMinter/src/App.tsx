@@ -4,6 +4,7 @@ import Home from './components/Home';
 import Video from './components/Video';
 import Layout from './components/Layout';
 import Login from "./components/Login";
+import TestVideo from './components/TestVideo';
 
 function App() {
   
@@ -12,8 +13,9 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout/>}>
       <Route index element={<Home/>} />
-      <Route path="/video" element={<Video/>}/>
+      <Route path="/video/:videoId" element={<Video/>}/>
       <Route path="/login" element={<Login/>} />
+      <Route path="/testVideo" element={<TestVideo/>}/>
       </Route>
     </Routes>
     </BrowserRouter>

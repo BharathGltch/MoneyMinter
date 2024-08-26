@@ -1,7 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { checkIfUserOwnsVideo } from '../../drizzle/dbUtil/dbUtil.js';
+import { checkIfUserOwnsVideo, registerTemporaryUser } from '../../drizzle/dbUtil/dbUtil.js';
 dotenv.config();
 let JwtSecret = process.env.JWTSECRET ? process.env.JWTSECRET : "";
 export async function videoReqAuth(req, res, next) {
@@ -10,44 +9,45 @@ export async function videoReqAuth(req, res, next) {
     if (!videoId) {
         res.status(404).json({ message: "No videoId" });
     }
-    let authToken = req.headers['authorization'];
+    console.log("The headers are", req.headers);
+    let authToken = req.headers["authorization"];
     console.log("authtoken", authToken);
     if (!authToken) {
-        res.status(401).json({ message: "You are not authorized" });
+        console.log("Token is undefined");
+        return res.status(404).json({ message: "You are unauthorized" });
     }
-    else {
-        try {
-            let token = authToken.split(" ")[1];
-            let decoded = jwt.verify(token, JwtSecret);
-            console.log("decoded is", decoded);
-            if (decoded && typeof decoded.userId == "string") {
-                //check if the userId and videoId match
-                let result = await checkIfUserOwnsVideo(videoId, decoded.userId);
-                if (!result) {
-                    res.status(401).json({ message: "you are unauthorized" });
-                    next();
-                }
-                req.userId = decoded.userId;
+    try {
+        let token = authToken.split(" ")[1];
+        console.log("The token after splitting is ", token);
+        let decoded = jwt.verify(token, JwtSecret);
+        console.log("decoded is", decoded);
+        if (decoded && typeof decoded.userId == "string") {
+            //check if the userId and videoId match
+            let result = await checkIfUserOwnsVideo(videoId, decoded.userId);
+            if (!result) {
+                res.status(401).json({ message: "you are unauthorized" });
                 next();
             }
-            else {
-                throw new Error();
-            }
-        }
-        catch (ex) {
-            res.status(404).json({
-                message: "You dont have the authorization"
-            });
+            req.userId = decoded.userId;
+            next();
         }
     }
+    catch (ex) {
+        console.log("Inside catch");
+        console.log("THe error is ", ex === null || ex === void 0 ? void 0 : ex.message);
+        return res.status(404).json({
+            message: "You dont have the authorization"
+        });
+    }
 }
-export function checkAndGiveUserId(req, res, next) {
+export async function checkAndGiveUserId(req, res, next) {
     let authToken = req.headers["authorization"];
     if (!authToken) {
-        let tempUserId = uuidv4();
+        //create a temp user
+        let tempUserId = await registerTemporaryUser();
         req.userId = tempUserId;
         let token = jwt.sign({ userId: tempUserId, loggedIn: false }, JwtSecret, { expiresIn: 60 * 10 });
-        res.setHeader('token', token);
+        req.token = token;
         next();
     }
     else {
@@ -56,12 +56,14 @@ export function checkAndGiveUserId(req, res, next) {
             let decoded = jwt.verify(token, JwtSecret);
             if (decoded && typeof decoded.userId == "string") {
                 req.userId = decoded.userId;
+                req.token = token;
                 next();
             }
         }
         catch (ex) {
             res.status(401).json({
-                message: "You dont have the authorization"
+                message: "You dont have the authorization",
+                logout: true
             });
         }
     }

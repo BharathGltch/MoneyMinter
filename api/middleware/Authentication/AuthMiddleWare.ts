@@ -2,12 +2,13 @@ import  {v4 as uuidv4} from 'uuid';
 import jwt, { JwtPayload } from "jsonwebtoken";
 import {Request,Response, NextFunction } from "express";
 import dotenv from "dotenv";
-import { checkIfUserOwnsVideo } from '../../drizzle/dbUtil/dbUtil.js';
+import { checkIfUserOwnsVideo, registerTemporaryUser } from '../../drizzle/dbUtil/dbUtil.js';
 dotenv.config();
 let JwtSecret=process.env.JWTSECRET?process.env.JWTSECRET:"";
 
 export interface CustomRequest extends Request{
-    userId:string
+    userId:string,
+    token:string
 }
 
 export interface MyJwtPayload extends JwtPayload{
@@ -21,14 +22,18 @@ export async function videoReqAuth(req:Request,res:Response,next:NextFunction){
     if(!videoId){
         res.status(404).json({message:"No videoId"});
     }
-    let authToken=req.headers['authorization'];
+    console.log("The headers are",req.headers);
+    let authToken=req.headers["authorization"];
+    
     console.log("authtoken",authToken);
     if(!authToken){
-       res.status(401).json({message:"You are not authorized"});
-       
-    }else{
+        console.log("Token is undefined");
+        return res.status(404).json({message:"You are unauthorized"})
+    }
+    
         try{
         let token=authToken.split(" ")[1];
+        console.log("The token after splitting is ",token);
         
         let decoded=jwt.verify(token,JwtSecret) as MyJwtPayload;
         console.log("decoded is",decoded);
@@ -43,26 +48,30 @@ export async function videoReqAuth(req:Request,res:Response,next:NextFunction){
 
         (req as CustomRequest).userId=decoded.userId;
         next();
-        }else{
-            throw new Error();
         }
-        }catch(ex){
-            res.status(404).json({
+        }catch(ex:any){
+            console.log("Inside catch");
+            console.log("THe error is ",ex?.message)
+
+          return  res.status(404).json({
                 message:"You dont have the authorization"
             })
         }
 
 
-    }
+    
 }
 
-export function checkAndGiveUserId(req:Request,res:Response,next:NextFunction){
+export async  function checkAndGiveUserId(req:Request,res:Response,next:NextFunction){
    let authToken=req.headers["authorization"];
    if(!authToken){
-    let tempUserId=uuidv4();
+   
+    //create a temp user
+    let tempUserId=await registerTemporaryUser();
     (req as CustomRequest).userId=tempUserId;
-   let token= jwt.sign({userId:tempUserId,loggedIn:false},JwtSecret,{expiresIn:60*10});
-    res.setHeader('token',token);
+    let token= jwt.sign({userId:tempUserId,loggedIn:false},JwtSecret,{expiresIn:60*10});
+    (req as CustomRequest).token=token;
+   
     next();
    }else{
     try{
@@ -70,11 +79,13 @@ export function checkAndGiveUserId(req:Request,res:Response,next:NextFunction){
         let decoded=jwt.verify(token,JwtSecret) as MyJwtPayload;
         if(decoded && typeof decoded.userId=="string"){
         (req as CustomRequest).userId=decoded.userId;
+        (req as CustomRequest).token=token;
         next();
         }
     }catch(ex){
         res.status(401).json({
-            message:"You dont have the authorization"
+            message:"You dont have the authorization",
+            logout:true
         })
     }
    }

@@ -3,20 +3,13 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
-import {
-  getJsonSearchTerms,
-  generateScript,
-} from "./util/geminiFolder/gemini.js";
-import { getPexelsVideo, downloadVideo } from "./util/pexels/pexels.js";
-import { getSrtFile } from "./util/geminiFolder/gemini.js";
+
 import {
   TypedRequestBody,
-  ProcessBody,
   processBodySchema,
-  processLoginBody,
+  
 } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
-import { db } from "./drizzle/db.js";
 import {
   createCoin,
   getVideoPath,
@@ -27,14 +20,9 @@ import {
   insertSearchTerms,
   insertSrtFilePath,
 } from "./drizzle/dbUtil/dbUtil.js";
-import {
-  burnSubtitles,
-  combineAudioAndVideo,
-  convertSrtToText,
-  getVideoDuration,
-  resizeVideo,
-} from "./util/ffmpegUtil/ffmpeg.js";
-import { textToSpeech } from "./util/gtts/gttsUtil.js";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
+
 import processRequest from "./util/processUtil/processUtil.js";
 import {videoReqAuth, checkAndGiveUserId, CustomRequest } from "./middleware/Authentication/AuthMiddleWare.js";
 import loginRouter from "./routers/loginRouter.js";
@@ -60,11 +48,13 @@ app.post(
   "/process",
   validateBody(processBodySchema),
   checkAndGiveUserId,
-  async (req: TypedRequestBody<{ queryString: string }>, res) => {
+  async (req: TypedRequestBody<{token:string, queryString: string }>, res) => {
+    let cusReq=req as CustomRequest;
     let query = req.body.queryString;
+    let userId=cusReq.userId;
     console.log("The query is " + query);
-   let finalVideoPath=await processRequest(query);
-    res.json({ finalVideoPath });
+    let videoId=await processRequest(query,userId);
+    res.json({token:cusReq.token, videoId });
   }
 );
 
@@ -76,8 +66,10 @@ app.get("/video/:videoId",videoReqAuth,async (expressRequest,_res)=>{
       //req.userId to access the userId
       //get the file url from the coinId in the db coin table
       let coinId=req.params["videoId"];
+      
 
       let videoPath=await getVideoPath(coinId);
+      console.log("The video Path is ",videoPath);
       if(videoPath==undefined)
         return _res.status(400).json({message:"Video Not Found"});
       if(videoPath.finalVideoPath==undefined)
@@ -123,11 +115,13 @@ app.get("/video/:videoId",videoReqAuth,async (expressRequest,_res)=>{
 })
 
 app.get("/videos",(req,_res)=>{
-  console.log(req.headers["authorization"]);
+  //console.log(JSON.stringify(req.headers.authorization));
+  console.log("The authorization header is ",req.headers["random"]);
+ 
   let filePath="downloads/demo.mp4";
 
   const stat=fs.statSync(filePath);
-  console.log(JSON.stringify(stat));
+   //console.log(JSON.stringify(stat));
   const fileSize=stat.size;
   const range=req.headers.range;
   console.log("range is",range);
@@ -162,9 +156,9 @@ app.get("/videos",(req,_res)=>{
       }
       _res.writeHead(200,head);
        fs.createReadStream(filePath).pipe(_res);
-     
   }
 })
+
 
  
 

@@ -22,10 +22,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ? process.env.GE
 app.use(express.json());
 app.use(cors(corsOptions));
 app.post("/process", validateBody(processBodySchema), checkAndGiveUserId, async (req, res) => {
+    let cusReq = req;
     let query = req.body.queryString;
+    let userId = cusReq.userId;
     console.log("The query is " + query);
-    let finalVideoPath = await processRequest(query);
-    res.json({ finalVideoPath });
+    let videoId = await processRequest(query, userId);
+    res.json({ token: cusReq.token, videoId });
 });
 app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
     const req = expressRequest;
@@ -35,6 +37,7 @@ app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
     //get the file url from the coinId in the db coin table
     let coinId = req.params["videoId"];
     let videoPath = await getVideoPath(coinId);
+    console.log("The video Path is ", videoPath);
     if (videoPath == undefined)
         return _res.status(400).json({ message: "Video Not Found" });
     if (videoPath.finalVideoPath == undefined)
@@ -71,10 +74,11 @@ app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
     }
 });
 app.get("/videos", (req, _res) => {
-    console.log(req.headers["authorization"]);
+    //console.log(JSON.stringify(req.headers.authorization));
+    console.log("The authorization header is ", req.headers["random"]);
     let filePath = "downloads/demo.mp4";
     const stat = fs.statSync(filePath);
-    console.log(JSON.stringify(stat));
+    //console.log(JSON.stringify(stat));
     const fileSize = stat.size;
     const range = req.headers.range;
     console.log("range is", range);
