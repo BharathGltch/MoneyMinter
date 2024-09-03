@@ -28,7 +28,7 @@ const corsOptions = {
 
 const app = express();
 const port = process.env.PORT || 3000;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
 const genAI = new GoogleGenerativeAI(
   process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : ""
 );

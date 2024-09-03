@@ -1,50 +1,42 @@
-import { FormEvent, useContext, useEffect, useState } from "react"
+import { FormEvent, useContext, useState } from "react"
 import { MyContext } from "./ContextProvider";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { TextField, Button, Typography } from "@mui/material";
 import axios from "axios";
 
-const Login = () => {
+const Register = () => {
     let context = useContext(MyContext);
-    console.log("context is ",context);
     let navigate = useNavigate();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [inputError,setInputError]=useState<string|null>(null);
-
-    useEffect(()=>{
-        console.log("Inside useEffect");
-        console.log("The context inside useEffect is ",context);
-        if (context?.isLoggedIn === true) {
-            console.log("context isnide condition is", context);
-            navigate("/");
-        }
-    },[context?.isLoggedIn,navigate])
-   
+    if (context?.isLoggedIn == true) {
+        navigate("/");
+    }
 
     const handleSubmit =async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setInputError("");
-        let loginData={
+        let registerData={
             username:username,
             password:password
         };
         if(username.length==0 || password.length==0){
             setInputError("Username and Password cannot be empty");
         }else{
-           axios.post("http://localhost:3000/login",loginData).then((res)=>{
-            console.log("The response is ",res.data);
+           axios.post("http://localhost:3000/register",registerData).then((res)=>{
              let token:string=res.data.token as string;
-             console.log("token returned is ",token);
+             if(res.data.message){
+              return setInputError(res.data.message);
+             }
              localStorage.setItem("token",token);
-             console.log(context);
              context?.setIsLoggedIn(true);
              navigate("/");
            })
            .catch((err)=>{
             if(err.response){
-                setInputError("Oops Something went wrong")
+                setInputError("Enter a unique username")
             }else if(err.request){
                 setInputError("Oops something went wrong")
             }else{
@@ -61,7 +53,7 @@ const Login = () => {
         <div className="w-full h-full flex flex-col items-center  bg-[#EEEEEE]">
             <div className="w-[400px] h-[400px] flex flex-col justify-center items-center">
                 <div className="mt-10">
-                    <Typography variant="h5">Login</Typography>
+                    <Typography variant="h5">Sign Up</Typography>
                 </div>
                 <form onSubmit={handleSubmit} className="mt-4 p-10 border-solid border-2 border-cyan-600  rounded-md" >
                     <div className="flex flex-col justify-center items-center">
@@ -77,13 +69,11 @@ const Login = () => {
                         </div>
                     </div>
                 </form>
-                <div className="mt-2">
-                    <Typography variant="subtitle2">Don't have an account? <Link to="/register" style={{ color: 'blue' }} >Register Here</Link> </Typography>
-                </div>
+                
             </div>
         </div>
     )
 }
 
 
-export default Login;
+export default Register;

@@ -62,7 +62,7 @@ export default function Video() {
 
 
   async function handleDownload() {
-    const response = await axios(`http://localhost:3000/videos`, {
+    const response = await axios(url, {
       headers: {
         "authorization": token
       },
@@ -78,15 +78,15 @@ export default function Video() {
     }
     const blob = await response.data;
 
-    const url = URL.createObjectURL(blob);
+    const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = objectUrl;
     a.download = 'downloaded-video.mp4';
     document.body.appendChild(a);
     a.click();
 
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(objectUrl);
   }
 
 

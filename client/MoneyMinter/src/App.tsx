@@ -5,6 +5,7 @@ import Video from './components/Video';
 import Layout from './components/Layout';
 import Login from "./components/Login";
 import TestVideo from './components/TestVideo';
+import Register from './components/Register';
 
 function App() {
   
@@ -16,6 +17,7 @@ function App() {
       <Route path="/video/:videoId" element={<Video/>}/>
       <Route path="/login" element={<Login/>} />
       <Route path="/testVideo" element={<TestVideo/>}/>
+      <Route path="/register" element={<Register/>}/>
       </Route>
     </Routes>
     </BrowserRouter>

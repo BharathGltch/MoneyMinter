@@ -7,7 +7,7 @@ export async function videoReqAuth(req, res, next) {
     let videoId = req.params.videoId;
     console.log("videoId is", videoId);
     if (!videoId) {
-        res.status(404).json({ message: "No videoId" });
+        return res.status(404).json({ message: "No videoId" });
     }
     console.log("The headers are", req.headers);
     let authToken = req.headers["authorization"];
@@ -66,5 +66,29 @@ export async function checkAndGiveUserId(req, res, next) {
                 logout: true
             });
         }
+    }
+}
+export async function verifyUser(req, res, next) {
+    let authToken = req.headers["authorization"];
+    if (!authToken) {
+        return res.status(401).json({
+            message: "You are not authorized"
+        });
+    }
+    try {
+        let token = authToken.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({
+                message: "You are not authorized"
+            });
+        }
+        jwt.verify(token, JwtSecret);
+        console.log("Verified");
+        next();
+    }
+    catch (ex) {
+        return res.status(401).json({
+            message: "You are not authorized"
+        });
     }
 }
