@@ -59,7 +59,7 @@ export async function processburningSubtitles(inputVideoFilePath, inputSrtFilePa
 export async function combineAudioAndVideo(videoPath, audioPath) {
     let outputPath = "downloads/finalVideo" + videoPath;
     let actualVideoPath = "downloads/" + videoPath;
-    let actualAudioPath = "downloads/" + audioPath;
+    let actualAudioPath = audioPath;
     await processCombiningAudioAndVideo(actualVideoPath, actualAudioPath, outputPath);
     return outputPath;
 }
@@ -169,6 +169,164 @@ async function processCuttingVideo(videoPath, outputPath) {
             e.message; // works, `e` narrowed to Error
         }
     }
+}
+export function generateSilenceFiles(silenceDurations) {
+    const silenceFiles = [];
+    // Temporary directory for storing silence files
+    // Ensure the temporary directory exists
+    // Helper function to generate silence file
+    const generateSilenceFile = (duration, index) => {
+        return new Promise((resolve, reject) => {
+            const silenceFile = `downloads/silence${index}.mp3`;
+            ffmpegfluent()
+                .input('anullsrc=r=44100:cl=stereo') // Input source: silence
+                .inputFormat('lavfi') // Format for the input
+                .audioFilters(`aformat=channel_layouts=stereo`)
+                .duration(duration) // Set duration of silence
+                .output(silenceFile) // Output file path
+                .audioCodec('libmp3lame') // MP3 codec
+                .audioBitrate('128k') // Set audio bitrate
+                .on('end', () => {
+                console.log(`Silence file created: ${silenceFile}`);
+                resolve(silenceFile);
+            })
+                .on('error', (err) => {
+                console.error('Error creating silence file:', err);
+                reject(err);
+            })
+                .run(); // Start the process
+        });
+    };
+    // Create silence files for all durations
+    const promises = silenceDurations.map((duration, index) => generateSilenceFile(duration, index));
+    return Promise.all(promises)
+        .then((files) => {
+        return files; // Return the array of silence file paths
+    })
+        .catch((err) => {
+        console.error('Error generating silence files:', err);
+        throw err;
+    });
+}
+export async function concatAudioFiles(audioFiles, silentFiles, outputFilePath) {
+    const tempFolder = "/downloads";
+    if (!fs.existsSync(tempFolder)) {
+        fs.mkdirSync(tempFolder);
+    }
+    return new Promise((resolve, reject) => {
+        const command = ffmpegfluent();
+        // Add each audio file to the ffmpeg input
+        audioFiles.forEach((file, index) => {
+            command.input(file);
+            if (silentFiles[index]) {
+                command.input(silentFiles[index]); // Add corresponding silence file
+            }
+        });
+        // Concatenate the audio files
+        command
+            .on('start', (cmd) => {
+            console.log('FFmpeg command:', cmd);
+        })
+            .on('end', () => {
+            console.log(`Concatenation finished successfully. Output file: ${outputFilePath}`);
+            resolve();
+        })
+            .on('error', (err) => {
+            console.error('Error during concatenation:', err === null || err === void 0 ? void 0 : err.message);
+            reject(err);
+        })
+            .mergeToFile(outputFilePath, tempFolder); // Specify the output file path
+    });
+}
+export async function concatAudioFilesWithSilence(audioFiles, silentFiles, outputFilePath) {
+    // const tempFolder = "/downloads";
+    // if (!fs.existsSync(tempFolder)) {
+    //   fs.mkdirSync(tempFolder);
+    // }
+    return new Promise((resolve, reject) => {
+        const inputs = [...audioFiles, ...silentFiles];
+        const inputOptions = inputs.map((file) => `-i ${file}`).join(' ');
+        const concatFilter = inputs
+            .map((_, i) => `[${i}:a]`)
+            .join('') + `concat=n=${inputs.length}:v=0:a=1[outa]`;
+        ffmpegfluent()
+            .inputOptions(inputOptions)
+            .complexFilter([concatFilter], 'outa')
+            .on('start', (cmd) => {
+            console.log('FFmpeg command:', cmd);
+        })
+            .on('end', () => {
+            console.log(`Concatenation finished successfully. Output file: ${outputFilePath}`);
+            resolve();
+        })
+            .on('error', (err) => {
+            console.error('Error during concatenation:', err === null || err === void 0 ? void 0 : err.message);
+            reject(err);
+        })
+            .save(outputFilePath)
+            .outputOptions('-map', '[outa]')
+            .outputOptions('-acodec', 'copy');
+    });
+}
+export async function padAudio(audioPath, length, index) {
+    let fileName = `downloads/audioPaddedFile${index}.mp3`;
+    return new Promise((resolve, reject) => {
+        ffmpegfluent(audioPath)
+            .duration(5) // Set the duration to 5 seconds
+            .audioFilters(`apad=pad_dur=${length}`) // Pad the audio to 5 seconds if shorter
+            .on('end', () => {
+            console.log('Audio padded or trimmed to 5 seconds');
+            resolve(fileName);
+        })
+            .on('error', (err) => {
+            console.error('Error processing audio:', err);
+            reject();
+        })
+            .save(fileName);
+    });
+}
+export async function concatAudioFilesWithoutSilence(audioFiles, savePath) {
+    return new Promise((resolve, reject) => {
+        let command = ffmpegfluent();
+        audioFiles.forEach((audioPath) => {
+            if (fs.existsSync(audioPath)) {
+                command.input(audioPath);
+            }
+        });
+        command
+            .complexFilter([
+            {
+                filter: 'concat',
+                options: {
+                    n: audioFiles.length,
+                    v: 0, // No video
+                    a: 1, // Audio only
+                },
+            },
+        ])
+            .on('start', function (cmdline) {
+            console.log('Start: Command line:', cmdline);
+        })
+            .on('progress', function (progress) {
+            console.info(`Processing: ${progress.percent}% done`);
+        })
+            .on('codecData', function (data) {
+            console.log('Codec Data:', data);
+        })
+            .on('end', function () {
+            console.log('File has been successfully concatenated');
+            resolve();
+        })
+            .on('stderr', (stdErrLine) => {
+            console.log('StdErr Output : ', stdErrLine);
+        })
+            .on('error', function (err) {
+            console.log("Inside the error");
+            console.log('An error occurred: ' + err.message);
+            reject();
+        }).save(savePath)
+            .run();
+    });
 }
 //burnSubtitles("as");
 //combineAudioAndVideo();

@@ -1,6 +1,6 @@
 import gTTS from "gtts";
 import fs, { readFileSync } from "fs";
-import say from "say";
+
 
 export async function textToSpeech(textFilePath: string) {
   let path = "downloads/" + textFilePath;
@@ -28,8 +28,3 @@ export function processTextToSpeech(text:string,actualOutputPath:string):Promise
   })
 }
 
-function textToSpeechSay(text: string) {
-  say.export(text, undefined, 1.0, "some.mp3", (err) => {
-    if (err) return console.log(err);
-  });
-}

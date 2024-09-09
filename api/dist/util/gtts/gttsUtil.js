@@ -1,6 +1,5 @@
 import gTTS from "gtts";
 import fs from "fs";
-import say from "say";
 export async function textToSpeech(textFilePath) {
     let path = "downloads/" + textFilePath;
     let data = fs.readFileSync(path);
@@ -23,11 +22,5 @@ export function processTextToSpeech(text, actualOutputPath) {
                 resolve();
             }
         });
-    });
-}
-function textToSpeechSay(text) {
-    say.export(text, undefined, 1.0, "some.mp3", (err) => {
-        if (err)
-            return console.log(err);
     });
 }
