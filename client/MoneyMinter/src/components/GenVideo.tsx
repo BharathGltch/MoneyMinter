@@ -36,12 +36,12 @@ export default function GenVideo(){
     }
     if(isLoading){
         return(
-                <ClipLoader />
+            <ClipLoader />
         )
     }
     return(
         <div className="w-full">
-            <div>
+            <div className="bg-white bg-opacity-20 rounded-md shadow-lg">
             <TextField
           id="standard-textarea"
           label="The Idea"
@@ -51,11 +51,13 @@ export default function GenVideo(){
           variant="filled"
           className="w-full"
           helperText={helperText}
+          color={"secondary"}
           error={error}
           onChange={(e)=>{setIdea(e.target.value)}}
           
         />
         </div>
+        
         <div className="flex justify-center m-5">
             <Button variant="contained" size="large" onClick={handleButtonClick}>Generate</Button>
         </div>

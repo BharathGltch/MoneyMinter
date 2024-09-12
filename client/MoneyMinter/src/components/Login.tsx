@@ -58,17 +58,17 @@ const Login = () => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col items-center  bg-[#EEEEEE]">
+        <div className="w-full h-full flex flex-col items-center  bg-[#000000]">
             <div className="w-[400px] h-[400px] flex flex-col justify-center items-center">
                 <div className="mt-10">
-                    <Typography variant="h5">Login</Typography>
+                    <Typography variant="h5" className="font-bold text-cyan-400">Login</Typography>
                 </div>
                 <form onSubmit={handleSubmit} className="mt-4 p-10 border-solid border-2 border-cyan-600  rounded-md" >
                     <div className="flex flex-col justify-center items-center">
-                        <div className="flex justify-center">
+                        <div className="flex justify-center bg-white bg-opacity-20 rounded-md shadow-lg">
                             <TextField fullWidth label="Username" variant="outlined" onChange={(e) => { setUsername(e.target.value) }} className="pt-10 w-full" />
                         </div>
-                        <div className="flex justify-content mt-3">
+                        <div className="flex justify-content mt-3 bg-white bg-opacity-20 rounded-md shadow-lg">
                             <TextField fullWidth label="Password" type="Password" variant="outlined" onChange={(e) => { setPassword(e.target.value) }} />
                         </div>
                         {inputError && <div style={{color:'red'}}>{inputError}</div>}
@@ -78,7 +78,7 @@ const Login = () => {
                     </div>
                 </form>
                 <div className="mt-2">
-                    <Typography variant="subtitle2">Don't have an account? <Link to="/register" style={{ color: 'blue' }} >Register Here</Link> </Typography>
+                    <Typography variant="subtitle2" className="text-cyan-400">Don't have an account? <Link to="/register" style={{ color: 'blue' }} >Register Here</Link> </Typography>
                 </div>
             </div>
         </div>

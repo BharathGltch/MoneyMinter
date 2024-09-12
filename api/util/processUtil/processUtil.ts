@@ -62,7 +62,7 @@ export default async function processRequest(query:string,userId:string){
     let textFilePath = await convertSrtToText(srtFilePath);
     console.log(textFilePath);
 
-    let audioWithSilence=await textToSpeechWithSilence(srtFilePath);
+    let audioWithSilence=await textToSpeechWithSilence(srtFilePath,coinId);
     console.log("The audioWithSilence Path in process.js  is ",audioWithSilence);
     //generate audio from the textFile
      //let audioFilePath =await textToSpeech(textFilePath);

@@ -1,13 +1,13 @@
 import fs from "fs";
 import { processTextToSpeech } from "../gtts/gttsUtil.js";
 import { concatAudioFilesWithoutSilence, padAudio } from "./ffmpeg.js";
-export async function textToSpeechWithSilence(srtFilePath) {
+export async function textToSpeechWithSilence(srtFilePath, coinId) {
     let finalPath = "downloads/AudioFileWithSilence_" + srtFilePath.slice(0, srtFilePath.length - 4) + ".mp3";
     console.log("The finalPath is ", finalPath);
     let actualSrtFilePath = "downloads/" + srtFilePath;
     let subtitles = await parseSrt(actualSrtFilePath);
     console.log(subtitles);
-    let audioFiles = await generateVoiceOvers(subtitles);
+    let audioFiles = await generateVoiceOvers(subtitles, coinId);
     console.log(audioFiles);
     // let silenceDurations=await calculateSilenceDurations(subtitles);
     await concatAudioFilesWithoutSilence(audioFiles, finalPath);
@@ -44,10 +44,10 @@ function timeToSeconds(timeString) {
         parseInt(secs, 10) +
         parseInt(millis, 10) / 1000);
 }
-async function generateVoiceOvers(subtitles) {
+async function generateVoiceOvers(subtitles, coinId) {
     const audioFiles = [];
     for (let i = 0; i < subtitles.length; i++) {
-        const outputFilePath = `downloads/voiceover${i}.mp3`;
+        const outputFilePath = `downloads/${coinId}voiceover${i}.mp3`;
         await processTextToSpeech(subtitles[i].text, outputFilePath);
         //add padding to these files
         let length = subtitles[i].endTime - subtitles[i].endTime;

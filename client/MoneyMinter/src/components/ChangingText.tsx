@@ -1,7 +1,7 @@
 import { useEffect,useState } from "react";
 export default function ChangingText(){
     const [changingText,setChangingText]=useState("");
-    let textArray:string[]=["create your own brain rot?","make your own Dopamine?"];
+    let textArray:string[]=["your own Content.","make your own Dopamine."];
     
   useEffect(()=>{
     let text=textArray[0];
@@ -30,9 +30,9 @@ export default function ChangingText(){
     return ()=> {if(typingInterval!=null)clearInterval(typingInterval)};
   },[])
     return(
-        <div className="flex">
-            <h1 className="text-4xl font-bold">Why not&nbsp; </h1>
-            <h1 className="text-4xl font-bold">{changingText}</h1>
+        <div className="flex ">
+            <h1 className="text-4xl font-bold text-purple-500 bg-opacity-20">Make&nbsp; </h1>
+            <h1 className="text-4xl font-bold text-purple-500">{changingText}</h1>
         </div>
     )
 }
