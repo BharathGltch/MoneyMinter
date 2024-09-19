@@ -27,7 +27,7 @@ export const MyContextProvider:React.FC<MyContextProviderProps>=({children})=>{
                         }
                     });
                     if(response.status>299 || response.status<200){
-                        localStorage.removeItem("token");
+                       
                         setIsLoggedIn(false);
                     }
                     else{

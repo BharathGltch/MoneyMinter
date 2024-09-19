@@ -1,8 +1,11 @@
-import { FormEvent, useContext, useEffect, useState } from "react"
+import { FormEvent, memo, useContext, useEffect, useState } from "react"
 import { MyContext } from "./ContextProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { TextField, Button, Typography } from "@mui/material";
 import axios from "axios";
+import ParticlesBack from "./ParticlesBack";
+
+const MemoizedParticle=memo(ParticlesBack);
 
 const Login = () => {
     let context = useContext(MyContext);
@@ -58,12 +61,20 @@ const Login = () => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col items-center  bg-[#000000]">
-            <div className="w-[400px] h-[400px] flex flex-col justify-center items-center">
+        <div className="w-full h-full flex flex-col items-center ">
+
+            {/*  Background  */}
+            <div className="fixed top-0 left-0 w-full h-full z-5">
+            <MemoizedParticle />
+            </div>
+
+
+            {/* Login Card */}
+            <div className="w-[400px] h-[400px] flex flex-col justify-center items-center z-10">
                 <div className="mt-10">
-                    <Typography variant="h5" className="font-bold text-cyan-400">Login</Typography>
+                    <Typography variant="h5" className="font-bold text-cyan-100">Login</Typography>
                 </div>
-                <form onSubmit={handleSubmit} className="mt-4 p-10 border-solid border-2 border-cyan-600  rounded-md" >
+                <form onSubmit={handleSubmit} className="mt-4 p-10 border-solid border-2 border-cyan-500  rounded-md" >
                     <div className="flex flex-col justify-center items-center">
                         <div className="flex justify-center bg-white bg-opacity-20 rounded-md shadow-lg">
                             <TextField fullWidth label="Username" variant="outlined" onChange={(e) => { setUsername(e.target.value) }} className="pt-10 w-full" />

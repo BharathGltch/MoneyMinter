@@ -1,7 +1,7 @@
 import { useEffect,useState } from "react";
 export default function ChangingText(){
     const [changingText,setChangingText]=useState("");
-    let textArray:string[]=["your own Content.","make your own Dopamine."];
+    let textArray:string[]=["your own Content.","your own Dopamine."];
     
   useEffect(()=>{
     let text=textArray[0];

@@ -25,8 +25,7 @@ export async function videoReqAuth(req, res, next) {
             //check if the userId and videoId match
             let result = await checkIfUserOwnsVideo(videoId, decoded.userId);
             if (!result) {
-                res.status(401).json({ message: "you are unauthorized" });
-                next();
+                return res.status(401).json({ message: "you are unauthorized" });
             }
             req.userId = decoded.userId;
             next();
@@ -82,8 +81,14 @@ export async function verifyUser(req, res, next) {
                 message: "You are not authorized"
             });
         }
-        jwt.verify(token, JwtSecret);
+        let payload = jwt.verify(token, JwtSecret);
+        console.log("payload is ", payload);
         console.log("Verified");
+        if (payload.loggedIn == false) {
+            return res.status(401).json({
+                message: "You are not authorized"
+            });
+        }
         next();
     }
     catch (ex) {

@@ -13,6 +13,7 @@ export interface CustomRequest extends Request{
 
 export interface MyJwtPayload extends JwtPayload{
     userId:string,
+    loggedIn:boolean
 }
 
 export async function videoReqAuth(req:Request,res:Response,next:NextFunction){
@@ -42,8 +43,7 @@ export async function videoReqAuth(req:Request,res:Response,next:NextFunction){
             //check if the userId and videoId match
         let result= await checkIfUserOwnsVideo(videoId,decoded.userId);
         if(!result){
-            res.status(401).json({message:"you are unauthorized"});
-            next();
+          return  res.status(401).json({message:"you are unauthorized"});
         }
 
         (req as CustomRequest).userId=decoded.userId;
@@ -105,8 +105,15 @@ export async function verifyUser(req:Request,res:Response,next:NextFunction){
                 message:"You are not authorized"
             });
         }
-     jwt.verify(token,JwtSecret);
+     let payload=jwt.verify(token,JwtSecret) as MyJwtPayload;
+     console.log("payload is ",payload);
      console.log("Verified");
+     if(payload.loggedIn==false){
+        return res.status(401).json({
+            message:"You are not authorized"
+        });
+     }
+    
      next();
     }catch(ex){
         return res.status(401).json({

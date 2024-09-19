@@ -3,6 +3,8 @@ import { MyContext } from "./ContextProvider"
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/Logo.png";
+import { FaGithub } from "react-icons/fa";
+
 
 export default function Appbar() {
     const context = useContext(MyContext);
@@ -13,30 +15,36 @@ export default function Appbar() {
     const handleLogout = () => {
         localStorage.removeItem("token");
         context?.setIsLoggedIn(false);
+        window.location.href = "/";
     }
 
-    const handleContribute=()=>{
-        const newWindow=window.open("https://github.com/BharathGltch/MoneyMinter",'_blank','noopener,noreferrer');
-        if(newWindow)
-            newWindow.opener=null;
+    const handleContribute = () => {
+        const newWindow = window.open("https://github.com/BharathGltch/MoneyMinter", '_blank', 'noopener,noreferrer');
+        if (newWindow)
+            newWindow.opener = null;
     }
 
-    
+
 
     if (context?.isLoggedIn === true) {
         return (
-            <div className="shadow-lg bg-[#FFFFFF]">
+            <div >
                 <div className="flex justify-between">
                     <div className="flex">
-                        <Link to="/">
-                            <img src="https://lirp.cdn-website.com/eb1755b3/dms3rep/multi/opt/OWAY-1314w.png" width={100} height={100} />
+                        <Link to="/" className="mt-4 ml-9">
+                            <img src={"https://lirp.cdn-website.com/eb1755b3/dms3rep/multi/opt/OWAY-1314w.png"} width={100} height={100} />
                         </Link>
-                        <p className="-ml-4 py-6 font-sans text-lg">Mint</p>
+                        <p className="-ml-4 py-6 font-sans text-lg"></p>
                     </div>
 
-                    <div className="mt-4 mr-6 flex">
-                        {/* <Button onClick={} variant="contained">Contribute</Button> */}
-                        <Button onClick={handleLogout} variant="contained">Logout</Button>
+                    <div className="mt-4 mb-1 mr-6 flex">
+                        <div className="flex justify-between mr-4">
+                            <Button onClick={handleContribute} variant="contained" size="small" ><FaGithub style={{ marginRight: '5px' }} />Contribute</Button>
+                        </div>
+                        <div>
+                            <Button onClick={handleLogout} variant="contained" >Logout</Button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -62,7 +70,7 @@ export default function Appbar() {
 
                 <div className="mt-4 mb-1 mr-6 flex">
                     <div className="flex justify-between mr-4">
-                        <Button onClick={handleContribute} variant="contained" size="small" >Contribute</Button>
+                        <Button onClick={handleContribute} variant="contained" size="small" ><FaGithub style={{ marginRight: '5px' }} />Contribute</Button>
                     </div>
                     <div className="flex justify-between mr-4">
                         <Button onClick={handleRegister} variant="contained" >SignUp</Button>

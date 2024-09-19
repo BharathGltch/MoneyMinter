@@ -1,8 +1,11 @@
-import { FormEvent, useContext, useState } from "react"
+import { FormEvent, memo, useContext, useState } from "react"
 import { MyContext } from "./ContextProvider";
 import {  useNavigate } from "react-router-dom";
 import { TextField, Button, Typography } from "@mui/material";
 import axios from "axios";
+import ParticlesBack from "./ParticlesBack";
+
+const MemoizedParticle=memo(ParticlesBack);
 
 const Register = () => {
     let context = useContext(MyContext);
@@ -50,17 +53,25 @@ const Register = () => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col items-center  bg-[#EEEEEE]">
-            <div className="w-[400px] h-[400px] flex flex-col justify-center items-center">
+        <div className="w-full h-full flex flex-col items-center">
+            {/*Background*/}
+            <div className="fixed top-0 left-0 w-full h-full z-5">
+                <MemoizedParticle/>
+            </div>
+
+
+            {/*Register Component */}
+
+            <div className="w-[400px] h-[400px] flex flex-col justify-center items-center z-20">
                 <div className="mt-10">
-                    <Typography variant="h5">Sign Up</Typography>
+                    <Typography variant="h5" className="font-bold text-cyan-100">Sign Up</Typography>
                 </div>
-                <form onSubmit={handleSubmit} className="mt-4 p-10 border-solid border-2 border-cyan-600  rounded-md" >
+                <form onSubmit={handleSubmit} className="mt-4 p-10 border-solid border-2 border-cyan-500  rounded-md" >
                     <div className="flex flex-col justify-center items-center">
-                        <div className="flex justify-center">
+                        <div className="flex justify-center  bg-white bg-opacity-20 rounded-md shadow-lg">
                             <TextField fullWidth label="Username" variant="outlined" onChange={(e) => { setUsername(e.target.value) }} className="pt-10 w-full" />
                         </div>
-                        <div className="flex justify-content mt-3">
+                        <div className="flex justify-content bg-white bg-opacity-20 rounded-md shadow-lg mt-3">
                             <TextField fullWidth label="Password" type="Password" variant="outlined" onChange={(e) => { setPassword(e.target.value) }} />
                         </div>
                         {inputError && <div style={{color:'red'}}>{inputError}</div>}

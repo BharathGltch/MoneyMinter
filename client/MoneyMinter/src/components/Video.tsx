@@ -1,8 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import ReactPlayer from "react-player";
 import { useParams } from "react-router-dom";
 import { Button } from "@mui/material";
+import ParticlesBack from "./ParticlesBack";
+
+
+const MemoizedParticle = memo(ParticlesBack);
 
 export default function Video() {
 
@@ -92,23 +96,30 @@ export default function Video() {
 
 
   return (
-    <div>
-      {loading && <div>Loading Video..</div>}
-      {error && <div>{error}</div>}
-      {!loading && !error && blobUrl && 
-      (<div className="flex justify-center align-center flex-col mt-20">
-        <div className="flex justify-center"> 
-          <ReactPlayer
-        controls
-        url={blobUrl}
-        width={"15%"}
-        height={"10%"}
-      /></div>
-      <div className="flex justify-center mt-5">
-        <Button variant="contained" onClick={handleDownload}>Download Video</Button>
-        </div>
-        </div>)
-      }
+    <div className="relative z-0" >
+
+      <div className="fixed top-0 left-0 h-full w-full z-5">
+        <MemoizedParticle />
+      </div>
+
+      <div className=" relative z-15">
+        {loading && <div>Loading Video..</div>}
+        {error && <div>{error}</div>}
+        {!loading && !error && blobUrl &&
+          (<div className="flex justify-center align-center flex-col mt-20">
+            <div className="flex justify-center">
+              <ReactPlayer
+                controls
+                url={blobUrl}
+                width={"15%"}
+                height={"20%"}
+              /></div>
+            <div className="flex justify-center mt-5">
+              <Button variant="contained" onClick={handleDownload}>Download Video</Button>
+            </div>
+          </div>)
+        }
+      </div>
 
     </div>
 

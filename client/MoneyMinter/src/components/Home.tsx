@@ -60,7 +60,7 @@ export default function Home() {
                 <h3 className="text-center text-2xl font-bold text-cyan-400">for free!</h3>
               </div>
             </div>
-            <div className="flex justify-center items-center m-5">
+            <div className="flex justify-center items-center m-5 z-30">
               <GenVideo />
             </div>
           </div>
