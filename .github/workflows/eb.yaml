@@ -42,7 +42,7 @@ jobs:
           application_name: Oway
           environment_name: Oway-env-1
           version_label: "app-${{ steps.format-time.outputs.replaced }}"
-          region: us-east-1
+          region: ap-south-1
           deployment_package: MoneyMinter.zip
 
       - name: Deployed!
