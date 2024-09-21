@@ -17,7 +17,7 @@ jobs:
 
       - name: Generate Deployment Package 
         # zip all files needed for deployment, including the Dockerfile
-        run: zip -r MoneyMinter.zip Dockerfile MoneyMinter/*
+        run: zip -r MoneyMinter.zip Dockerfile MoneyMinter/* MoneyMinter/.env
 
       - name: Get timestamp
         uses: gerred/actions/current-time@master
