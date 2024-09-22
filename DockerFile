@@ -5,13 +5,13 @@ FROM node:16.1-alpine AS build-stage
 WORKDIR /app
 
 # Copy the package.json and package-lock.json (if exists) from the frontend folder
-COPY MoneyMinter/package*.json ./
+COPY ./MoneyMinter/package*.json ./ 
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the frontend application code
-COPY MoneyMinter/ ./
+COPY ./MoneyMinter/ ./ 
 
 # Build the application
 RUN npm run build
