@@ -13,12 +13,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: SSH and deploy
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Setup SSH
       run: |
+        # Create SSH key file
         echo "$SSH_PRIVATE_KEY" > keyfile
         chmod 600 keyfile
+        
+        # Create .ssh directory and copy known_hosts
         mkdir -p ~/.ssh
         cp known_hosts ~/.ssh/known_hosts
+
+        # Ensure the known_hosts file contains the EC2 instance's key
+        ssh-keyscan -H ec2-13-200-235-248.ap-south-1.compute.amazonaws.com >> ~/.ssh/known_hosts || true
+
+    - name: SSH and deploy
+      run: |
         ssh -t -i keyfile ubuntu@ec2-13-200-235-248.ap-south-1.compute.amazonaws.com "sudo bash ~/deploy.sh"
