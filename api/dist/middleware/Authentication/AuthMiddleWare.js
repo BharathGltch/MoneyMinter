@@ -14,7 +14,7 @@ export async function videoReqAuth(req, res, next) {
     console.log("authtoken", authToken);
     if (!authToken) {
         console.log("Token is undefined");
-        return res.status(404).json({ message: "You are unauthorized" });
+        return res.status(404).json({ message: "You are test unauthorized" });
     }
     try {
         let token = authToken.split(" ")[1];
