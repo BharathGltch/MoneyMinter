@@ -2,7 +2,6 @@ import { Button } from "@mui/material"
 import { MyContext } from "./ContextProvider"
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/Logo.png";
 import { FaGithub } from "react-icons/fa";
 
 

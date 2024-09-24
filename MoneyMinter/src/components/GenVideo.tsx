@@ -2,7 +2,6 @@ import { Button, LinearProgress, TextField } from "@mui/material"
 import { useState } from "react"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { ClipLoader } from "react-spinners";
 
 
 export default function GenVideo(){

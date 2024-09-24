@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import ParticlesComponent, { initParticlesEngine } from "@tsparticles/react"; // Importing it as ParticlesComponent to avoid name collision with the function
 import { loadSlim } from "@tsparticles/slim";
-import { Engine } from "@tsparticles/engine";
 
 const ParticlesBack = () => {
     const [init, setInit] = useState(false);
