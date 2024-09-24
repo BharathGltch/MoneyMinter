@@ -1,49 +1,22 @@
-name: Deploy MoneyMinter Frontend from GitHub to AWS Elastic Beanstalk
+name: Deploy backend
+
 on:
-  # activates the workflow when there is a push on the main branch
   push:
     branches:
-      - main
+      - master 
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest # the OS your job should run on
-    strategy:
-      matrix:
-        node-version: [16.x]
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Latest Repo
-        # checks out your repository under the GitHub workspace so that your workflow can access it
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Generate Deployment Package 
-        # zip all files needed for deployment, including the Dockerfile
-        run: zip -r MoneyMinter.zip Dockerfile MoneyMinter/*
-
-      - name: Get timestamp
-        uses: gerred/actions/current-time@master
-        id: current-time
-
-      - name: Run string replace
-        uses: frabert/replace-string-action@master
-        id: format-time
-        with:
-          # replaces '[:\.]+' in the timestamp with '-'
-          pattern: '[:\.]+'
-          string: "${{ steps.current-time.outputs.time }}"
-          replace-with: '-'
-          flags: 'g'
-
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          # input the credentials you used to setup AWS CLI and credentials for the application environment
-          aws_access_key: "${{ secrets.ACCESS_KEY }}"
-          aws_secret_key: "${{ secrets.SECRET_ACCESS_KEY }}"
-          application_name: Oway
-          environment_name: Oway-env
-          version_label: "app-${{ steps.format-time.outputs.replaced }}"
-          region: ap-south-1
-          deployment_package: MoneyMinter.zip
-
-      - name: Deployed!
-        run: echo App deployed to ELB
+    - name: SSH and deploy
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+      run: |
+        echo "$SSH_KEY" > keyfile
+        chmod 600 keyfile
+        ssh -t -i keyfile ubuntu@ec2-13-200-235-248.ap-south-1.compute.amazonaws.com "sudo bash ~/deploy.sh"
