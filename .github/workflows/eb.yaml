@@ -3,14 +3,14 @@ name: Deploy
 on:
   push:
     branches:
-      - master 
+      - main 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout puseded code
+    - name: Checkout code
       uses: actions/checkout@v2
 
     - name: SSH and deploy
