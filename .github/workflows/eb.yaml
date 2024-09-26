@@ -11,14 +11,15 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: SSH and deploy
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Setup SSH
       run: |
-        echo "$SSH_PRIVATE_KEY" > keyfile
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > keyfile
         chmod 600 keyfile
         mkdir -p ~/.ssh
-        cp known_hosts ~/.ssh/known_hosts
-        ssh -t -i keyfile ubuntu@ec2-13-200-235-248.ap-south-1.compute.amazonaws.com "sudo bash ~/deploy.sh"
+        ssh-keyscan -H ec2-13-200-235-248.ap-south-1.compute.amazonaws.com >> ~/.ssh/known_hosts || true
+
+    - name: SSH and deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no -i keyfile ubuntu@ec2-13-200-235-248.ap-south-1.compute.amazonaws.com "sudo bash ~/deploy.sh"
