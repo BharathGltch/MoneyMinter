@@ -1,7 +1,7 @@
+import React, { useEffect, useRef, useState } from "react";
 import ChangingText from "./ChangingText";
 import GenVideo from "./GenVideo";
 import Video from "../../public/HomeBackground.mp4";
-import { useEffect, useRef, useState } from "react";
 import Loading from "./Loading";
 
 export default function Home() {
@@ -10,61 +10,55 @@ export default function Home() {
 
   useEffect(() => {
     const handleCanPlay = () => {
-      setIsLoading(false); // Video can play, stop showing the loading message
+      setIsLoading(false);
     };
 
     if (videoRef.current) {
-      // Use the correct event name 'canplay' (all lowercase)
       videoRef.current.addEventListener("canplay", handleCanPlay);
     }
 
     return () => {
       if (videoRef.current) {
-        // Clean up the event listener when the component unmounts
         videoRef.current.removeEventListener("canplay", handleCanPlay);
       }
     };
   }, []);
 
   return (
-
-    <div className="w-screen h-full">
+    <div className="fixed inset-0 overflow-hidden">
       <video
-            ref={videoRef}
-            preload="auto"
-            autoPlay
-            muted
-            loop
-            className="fixed top-0 left-0 w-full h-full object-cover z-0"
-            id="backGroundVideo"
-          >
-            <source src={Video} type="video/mp4" />
-          </video>
+        ref={videoRef}
+        preload="auto"
+        autoPlay
+        muted
+        loop
+        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        id="backGroundVideo"
+      >
+        <source src={Video} type="video/mp4" />
+      </video>
 
-      {isLoading && (
-        <>
-          <Loading/>
-        </>
-      )}
+      {isLoading && <Loading />}
 
       {!isLoading && (
-        <>
-          
-          <div className="relative z-10 mx-40">
-            <div className="flex pt-[100px] z-20">
+        <div className="relative z-10 h-full w-full overflow-auto">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-full flex flex-col justify-center">
+            <div className="flex-shrink-0">
               <ChangingText />
             </div>
-            <div className="flex justify-center items-center mt-[100px]">
-              <div>
-                <h3 className="text-2xl font-bold text-cyan-400">Make your own short vids</h3>
-                <h3 className="text-center text-2xl font-bold text-cyan-400">for free!</h3>
-              </div>
+            <div className="mt-8 sm:mt-12 text-center flex-shrink-0">
+              <h3 className="text-xl sm:text-2xl font-bold text-cyan-400">
+                Make your own short vids
+              </h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-cyan-400">
+                for free!
+              </h3>
             </div>
-            <div className="flex justify-center items-center m-5 z-30">
+            <div className="flex justify-center items-center mt-8 sm:mt-12 flex-shrink-0">
               <GenVideo />
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
