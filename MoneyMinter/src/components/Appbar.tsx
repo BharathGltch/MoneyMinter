@@ -1,11 +1,16 @@
 import { Button } from "@mui/material"
 import { MyContext } from "./ContextProvider"
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaGithub } from "react-icons/fa";
+import { CiMenuBurger } from "react-icons/ci";
+import MenuIcon from '@mui/icons-material/Menu';
+
 
 
 export default function Appbar() {
+
+    const [mobileMenuOpen,setMobileMenuOpen]=useState<boolean>();
     const context = useContext(MyContext);
     console.log("Context inside appbar is ", context);
     const navigate = useNavigate();
@@ -27,13 +32,13 @@ export default function Appbar() {
 
     if (context?.isLoggedIn === true) {
         return (
-            <div >
+            <div className="container mx-auto px-2">
                 <div className="flex justify-between">
                     <div className="flex">
                         <Link to="/" className="mt-4 ml-9">
                             <img src={"https://lirp.cdn-website.com/eb1755b3/dms3rep/multi/opt/OWAY-1314w.png"} width={100} height={100} />
                         </Link>
-                        <p className="-ml-4 py-6 font-sans text-lg"></p>
+                        
                     </div>
 
                     <div className="mt-4 mb-1 mr-6 flex">
@@ -56,28 +61,30 @@ export default function Appbar() {
 
     const handleRegister = () => {
         navigate("/register");
-    }
+    }   
     return (
-        <div >
-            <div className="flex justify-between">
-                <div className="flex">
-                    <Link to="/" className="mt-4 ml-9">
-                        <img src={"https://lirp.cdn-website.com/eb1755b3/dms3rep/multi/opt/OWAY-1314w.png"} width={100} height={100} />
+        <div className="container mx-auto px-1">
+            <div className="flex justify-between items-center py-4">
+                <div className="flex items-center">
+                    <Link to="/" className="flex items-center px-2">
+                        <img src={"https://lirp.cdn-website.com/eb1755b3/dms3rep/multi/opt/OWAY-1314w.png"} alt="Logo" className="max-h-8 sm:max-h-12  w-auto h-auto" />
                     </Link>
-                    <p className="-ml-4 py-6 font-sans text-lg"></p>
+                   
                 </div>
 
-                <div className="mt-4 mb-1 mr-6 flex">
-                    <div className="flex justify-between mr-4">
-                        <Button onClick={handleContribute} variant="contained" size="small" ><FaGithub style={{ marginRight: '5px' }} />Contribute</Button>
-                    </div>
-                    <div className="flex justify-between mr-4">
+                <div className="hidden sm:flex items-center space-x-4">
+                        <Button onClick={handleContribute} variant="contained" ><FaGithub className="mr-2" />Contribute</Button>                
+                   
                         <Button onClick={handleRegister} variant="contained" >SignUp</Button>
-                    </div>
-                    <div>
+                    
                         <Button onClick={handleLogin} variant="contained" >Login</Button>
-                    </div>
+                </div>
 
+                <div className="sm:hidden">
+                       <Button>
+                        <MenuIcon/>
+                        </Button>
+                       
                 </div>
             </div>
         </div>

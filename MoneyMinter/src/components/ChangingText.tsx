@@ -31,8 +31,8 @@ export default function ChangingText(){
   },[])
     return(
         <div className="flex ">
-            <h1 className="text-4xl font-bold text-purple-500 bg-opacity-20">Make&nbsp; </h1>
-            <h1 className="text-4xl font-bold text-purple-500">{changingText}</h1>
+            <h1 className="text-2xl sm:text-4xl font-bold text-purple-500 bg-opacity-20">Make&nbsp; </h1>
+            <h1 className="text-2xl sm:text-4xl font-bold text-purple-500">{changingText}</h1>
         </div>
     )
 }

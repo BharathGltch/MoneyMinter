@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import  { useEffect, useRef, useState } from "react";
 import ChangingText from "./ChangingText";
 import GenVideo from "./GenVideo";
 import Video from "../../public/HomeBackground.mp4";
