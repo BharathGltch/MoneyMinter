@@ -13,7 +13,8 @@ export default function GenVideo(){
 
     const navigate=useNavigate();
 
-    const handleButtonClick=()=>{
+    const handleSubmit=(e:React.FormEvent)=>{
+        e.preventDefault();
         if(idea.length==0){
             setError(true);
             setHelperText("Idea cannot be empty");
@@ -47,6 +48,7 @@ export default function GenVideo(){
                 console.log("Error ",error);
              }).finally(()=>{
                 clearInterval(interval);
+                setProgress(0);
              })
         }
     }
@@ -59,7 +61,9 @@ export default function GenVideo(){
     }
     return(
         <div className="w-full">
+             <form onSubmit={handleSubmit} id="GenVideoForm" name="GenVideoFormName">
             <div className="bg-white bg-opacity-20 rounded-md shadow-lg">
+               
             <TextField
           id="standard-textarea"
           label="The Idea"
@@ -72,14 +76,22 @@ export default function GenVideo(){
           color={"secondary"}
           error={error}
           onChange={(e)=>{setIdea(e.target.value)}}
+          onKeyDown={(e)=>{
+            if(e.key==="Enter"){
+                handleSubmit(e as unknown as React.FormEvent);
+                return;
+            }
+            return;
+          }}
           
         />
         </div>
         
         <div className="flex justify-center m-5">
-            <Button variant="contained" size="large" onClick={handleButtonClick}>Generate</Button>
+            <Button type="submit" variant="contained" size="large" >Generate</Button>
         </div>
-        
+       
+        </form>
         </div>
     )
 }

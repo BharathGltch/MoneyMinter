@@ -1,4 +1,4 @@
-import { Button } from "@mui/material"
+import { Button, Divider, Drawer, IconButton, List, ListItem, ListItemText } from "@mui/material"
 import { MyContext } from "./ContextProvider"
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,13 +7,14 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 
 
-
 export default function Appbar() {
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+    const [isDrawerOpen, setDrawerOpen] = useState<boolean>(false);
     const context = useContext(MyContext);
     console.log("Context inside appbar is ", context);
     const navigate = useNavigate();
+
+
 
 
     const handleLogout = () => {
@@ -28,8 +29,8 @@ export default function Appbar() {
             newWindow.opener = null;
     }
 
-    const handleMenuClick=()=>{
-        setMobileMenuOpen((prevVal)=>!prevVal);
+    const toggleDrawer = (value: boolean) => () => {
+        setDrawerOpen(value);
     }
 
 
@@ -66,12 +67,13 @@ export default function Appbar() {
     const handleRegister = () => {
         navigate("/register");
     }
+
     return (
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-1">
             <div className="flex justify-between items-center py-4">
                 <div className="flex items-center">
                     <Link to="/" className="flex items-center px-2">
-                        <img src={"https://lirp.cdn-website.com/eb1755b3/dms3rep/multi/opt/OWAY-1314w.png"} alt="Logo" className="max-h-8 sm:max-h-10  w-auto h-auto" />
+                        <img src={"https://lirp.cdn-website.com/eb1755b3/dms3rep/multi/opt/OWAY-1314w.png"} alt="Logo" className="max-h-8 sm:max-h-12  w-auto h-auto" />
                     </Link>
 
                 </div>
@@ -85,19 +87,48 @@ export default function Appbar() {
                 </div>
 
                 <div className="sm:hidden">
-                    <Button onClick={handleMenuClick}>
+                    <IconButton
+                        edge="start"
+                        color="primary"
+                        aria-label="menu"
+                        onClick={toggleDrawer(true)}
+                    >
                         <MenuIcon />
-                    </Button>
-                    {mobileMenuOpen &&
-                     <div className="sm:hidden fixed inset-x-0 top-16 bg-gray-900 shadow-lg z-50 transition-all duration-300 ease-in-out">
-                                <div className="flex flex-col items-center py-4 space-y-2">
-                                           
-                        <Button onClick={handleContribute} variant="contained" fullWidth><FaGithub className="mr-2" />Contribute</Button>
-                        <Button onClick={handleRegister} variant="contained" fullWidth>SignUp</Button>
-                        <Button onClick={handleLogin} variant="contained" fullWidth>Login</Button>             
-                                </div>
-                        </div>}
-
+                    </IconButton>
+                    <Drawer anchor="right" open={isDrawerOpen} onClose={toggleDrawer(false)} PaperProps={{
+                        sx: {
+                            backgroundColor: "black",
+                            color: "primary.main"
+                        }
+                    }} >
+                        <div>
+                            <List>
+                                <ListItem  onClick={handleContribute}>
+                                    <FaGithub className="mr-2" />
+                                    <ListItemText primary="Contribute" />
+                                </ListItem>
+                                <Divider color="purple"/>
+                                
+                                {context?.isLoggedIn ? (
+                                    <ListItem onClick={handleLogout}>
+                                        <ListItemText primary="Logout" />
+                                    </ListItem>
+                                    
+                                ) : (
+                                    <>
+                                        <ListItem onClick={handleRegister}>
+                                            <ListItemText primary="Sign Up" color="primary" />
+                                        </ListItem>
+                                        <Divider color="purple"/>
+                                        <ListItem onClick={handleLogin}>
+                                            <ListItemText primary="Login" color="blue" />
+                                        </ListItem>
+                                       
+                                    </>
+                                )}
+                            </List>
+                        </div>
+                    </Drawer>
                 </div>
             </div>
         </div>
