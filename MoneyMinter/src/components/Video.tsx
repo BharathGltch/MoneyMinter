@@ -102,19 +102,20 @@ export default function Video() {
         <MemoizedParticle />
       </div>
 
-      <div className=" relative z-15">
+      <div className="relative z-15 container mx-auto px-4 ">
         {loading && <div>Loading Video..</div>}
-        {error && <div>{error}</div>}
+        {error && <div className="text-center text-white">{error}</div>}
         {!loading && !error && blobUrl &&
-          (<div className="flex justify-center align-center flex-col mt-20">
-            <div className="flex justify-center">
+          (<div className="flex flex-col items-center">
+            <div className="w-full max-w-2xl aspect-[16/9]">
               <ReactPlayer
                 controls
                 url={blobUrl}
-                width={"15%"}
-                height={"20%"}
+                width={"100%"}
+                height={"100%"}
+                className="rounded-lg overflow-hidden"
               /></div>
-            <div className="flex justify-center mt-5">
+            <div className="flex justify-center mt-4">
               <Button variant="contained" onClick={handleDownload}>Download Video</Button>
             </div>
           </div>)

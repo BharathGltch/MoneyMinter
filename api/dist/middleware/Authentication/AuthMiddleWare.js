@@ -45,7 +45,7 @@ export async function checkAndGiveUserId(req, res, next) {
         //create a temp user
         let tempUserId = await registerTemporaryUser();
         req.userId = tempUserId;
-        let token = jwt.sign({ userId: tempUserId, loggedIn: false }, JwtSecret, { expiresIn: 60 * 10 });
+        let token = jwt.sign({ userId: tempUserId, loggedIn: false }, JwtSecret, { expiresIn: 60 * 20 });
         req.token = token;
         next();
     }
