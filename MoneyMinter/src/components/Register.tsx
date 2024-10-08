@@ -7,6 +7,7 @@ import ParticlesBack from "./ParticlesBack";
 
 const MemoizedParticle=memo(ParticlesBack);
 
+let url = import.meta.env.VITE_SERVER_URL as string;
 const Register = () => {
     let context = useContext(MyContext);
     let navigate = useNavigate();
@@ -28,7 +29,7 @@ const Register = () => {
         if(username.length==0 || password.length==0){
             setInputError("Username and Password cannot be empty");
         }else{
-           axios.post("http://localhost:3000/register",registerData).then((res)=>{
+           axios.post(url+"/register",registerData).then((res)=>{
              let token:string=res.data.token as string;
              if(res.data.message){
               return setInputError(res.data.message);

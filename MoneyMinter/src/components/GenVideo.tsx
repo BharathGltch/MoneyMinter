@@ -3,7 +3,7 @@ import { useState } from "react"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
+let url = import.meta.env.VITE_SERVER_URL as string;
 export default function GenVideo(){
     const [idea,setIdea]=useState("");
     const [error,setError]=useState(false);
@@ -36,7 +36,7 @@ export default function GenVideo(){
                 
             },1000);
             setIsLoading(true);
-             axios.post("http://localhost:3000/process",formData)
+             axios.post(url+"/process",formData)
              .then(response=>{
                 setIsLoading(false);
                 localStorage.setItem("token",response.data.token);

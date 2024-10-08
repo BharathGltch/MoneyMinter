@@ -39,6 +39,7 @@ export const MyContextProvider:React.FC<MyContextProviderProps>=({children})=>{
             }catch(ex){
                 setIsLoggedIn(false);
                 localStorage.removeItem("token");
+                
             }
             }
             checkIsLoggedIn();

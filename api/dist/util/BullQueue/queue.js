@@ -6,4 +6,7 @@ const videoQueue = new Bull('videoQueue', {
         password: "mF5IVnzMy0Ok5FoTwDYCJtVjsukmUg4V"
     },
 });
-export default videoQueue;
+const insertQueue = (videoPath) => {
+    videoQueue.add({ videoPath });
+};
+export { videoQueue, insertQueue };
