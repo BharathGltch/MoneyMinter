@@ -18,7 +18,10 @@ import processRequest from "./util/processUtil/processUtil.js";
 import { videoReqAuth, checkAndGiveUserId, CustomRequest } from "./middleware/Authentication/AuthMiddleWare.js";
 import loginRouter from "./routers/loginRouter.js";
 
+
 dotenv.config();
+
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const corsOptions = {
