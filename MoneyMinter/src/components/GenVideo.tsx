@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 let url = import.meta.env.VITE_SERVER_URL as string;
+console.log("Backend URl" ,url);
 export default function GenVideo(){
     const [idea,setIdea]=useState("");
     const [error,setError]=useState(false);
