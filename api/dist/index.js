@@ -18,8 +18,8 @@ const corsOptions = {
 const app = express();
 const port = process.env.PORT || 3000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : "");
+app.use(cors());
 app.use(express.json());
-app.use(cors(corsOptions));
 app.post("/process", validateBody(processBodySchema), checkAndGiveUserId, async (req, res) => {
     let cusReq = req;
     let query = req.body.queryString;
