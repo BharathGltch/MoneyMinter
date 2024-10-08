@@ -1,4 +1,4 @@
-import express,{Request} from "express";
+import express,{Request,Response,NextFunction} from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -30,6 +30,13 @@ const corsOptions = {
   origin: "*", // Whitelist the domains you want to allow
 };
 
+const allowCrossDomain = (req:Request, res:Response, next:NextFunction) => {
+  res.header(`Access-Control-Allow-Origin`, `example.com`);
+  res.header(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
+  res.header(`Access-Control-Allow-Headers`, `Content-Type`);
+  next();
+};
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -37,8 +44,8 @@ const genAI = new GoogleGenerativeAI(
   process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : ""
 );
 // app.options('*',cors());
-app.use(cors<Request>());
-
+// app.use(cors<Request>());
+app.use(allowCrossDomain);
 app.use(express.json());
 
 
