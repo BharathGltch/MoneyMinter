@@ -1,4 +1,5 @@
 import { createCoin, insertFinalVideoPath, insertPexelsVideoPath, insertResizedVideoPath, insertScript, insertSearchTerms, insertSrtFilePath } from "../../drizzle/dbUtil/dbUtil.js";
+import { insertQueue } from "../BullQueue/queue.js";
 import { burnSubtitles, combineAudioAndVideo, convertSrtToText, cutVideo, getVideoDuration, resizeVideo } from "../ffmpegUtil/ffmpeg.js";
 import { textToSpeechWithSilence } from "../ffmpegUtil/genAudio.js";
 import { generateScript, getJsonSearchTerms, getSrtFile } from "../geminiFolder/gemini.js";
@@ -73,5 +74,6 @@ export default async function processRequest(query:string,userId:string){
      let finalVideoPath=await combineAudioAndVideo(subtitledVideoPath,audioFilePath);
       //insert the videoPath
       await insertFinalVideoPath(coinId,finalVideoPath);
+      await insertQueue(finalVideoPath);
       return coinId;
 } 

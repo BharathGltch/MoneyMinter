@@ -1,6 +1,10 @@
 import Bull from "bull";
 
-const videoQueue=new Bull('videoQueue',{
+interface VideoJobData{
+    videoPath:string
+}
+
+const videoQueue=new Bull<VideoJobData>('videoQueue',{
     redis:{
             host:"redis-13173.c51.ap-southeast-2-1.ec2.redns.redis-cloud.com",
             port:13173,
@@ -8,6 +12,10 @@ const videoQueue=new Bull('videoQueue',{
     },
 });
 
-export default videoQueue;
+const insertQueue=(videoPath:string)=>{
+        videoQueue.add({videoPath});
+}
+
+export { VideoJobData,videoQueue,insertQueue};
 
 
