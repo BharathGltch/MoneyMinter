@@ -31,9 +31,9 @@ const corsOptions = {
 };
 
 const allowCrossDomain = (req:Request, res:Response, next:NextFunction) => {
-  res.header(`Access-Control-Allow-Origin`, `http://localhost:5173`);
-  res.header(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
-  res.header(`Access-Control-Allow-Headers`, `Content-Type`);
+  res.setHeader(`Access-Control-Allow-Origin`, `http://localhost:5173`);
+  res.setHeader(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
+  res.setHeader(`Access-Control-Allow-Headers`, `Content-Type`);
   next();
 };
 
@@ -43,9 +43,10 @@ const port = process.env.PORT || 3000;
 const genAI = new GoogleGenerativeAI(
   process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : ""
 );
-// app.options('*',cors());
-// app.use(cors<Request>());
+
 app.use(allowCrossDomain);
+app.options('*',cors());
+app.use(cors());
 app.use(express.json());
 
 
