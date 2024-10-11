@@ -45,10 +45,13 @@ const genAI = new GoogleGenerativeAI(
 );
 
 app.use(allowCrossDomain);
-app.options('*',cors());
-app.use(cors());
 app.use(express.json());
-
+app.use((req, res, next) => {
+  req.setTimeout(120000, () => {
+    res.status(504).send('Request timed out.');
+  });
+  next();
+});
 
 app.post(
   "/process",
