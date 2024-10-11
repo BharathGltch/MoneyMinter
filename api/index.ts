@@ -43,7 +43,7 @@ const port = process.env.PORT || 3000;
 const genAI = new GoogleGenerativeAI(
   process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : ""
 );
-
+app.use(cors<Request>());
 app.use(allowCrossDomain);
 app.use(express.json());
 app.use((req, res, next) => {
