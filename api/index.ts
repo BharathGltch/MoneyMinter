@@ -47,7 +47,7 @@ app.use(cors<Request>());
 app.use(allowCrossDomain);
 app.use(express.json());
 app.use((req, res, next) => {
-  req.setTimeout(120000, () => {
+  req.setTimeout(240000, () => {
     res.status(504).send('Request timed out.');
   });
   next();
