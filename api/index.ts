@@ -21,30 +21,28 @@ import loginRouter from "./routers/loginRouter.js";
 
 
 dotenv.config();
-
-
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
-const corsOptions = {
-  credentials: true,
-  origin: "*", // Whitelist the domains you want to allow
-};
-
-const allowCrossDomain = (req:Request, res:Response, next:NextFunction) => {
-  res.setHeader(`Access-Control-Allow-Origin`, `http://localhost:5173`);
-  res.setHeader(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
-  res.setHeader(`Access-Control-Allow-Headers`, `Content-Type`);
-  next();
-};
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const genAI = new GoogleGenerativeAI(
-  process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : ""
-);
-app.use(cors<Request>());
+const allowCrossDomain = (req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true'); // If you need to send credentials like cookies
+
+  // Intercept OPTIONS method
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200); // Allow preflight to continue
+  } else {
+    next();
+  }
+};
+
+
 app.use(allowCrossDomain);
+app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
   req.setTimeout(240000, () => {
