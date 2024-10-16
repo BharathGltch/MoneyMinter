@@ -19,4 +19,4 @@ Tailwind
 
 Postgresql
 
-Kafka MQ
+Redis
