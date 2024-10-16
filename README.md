@@ -1,4 +1,4 @@
-# Money Minter
+# Money Minter(Owayyy)
 
 
 Automates the process of generating and uploading a Youtube Short by getting a video idea from the user and using videos from PEXELS. It then generates a script using Gemini. 
