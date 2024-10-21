@@ -3,8 +3,10 @@ import ffmpegfluent from "fluent-ffmpeg";
 import { path as ffprobePath } from "ffprobe-static";
 import fs from "fs";
 import { parse } from "subtitle";
+import os from "os";
 ffmpegfluent.setFfmpegPath(ffmpegStatic);
 ffmpegfluent.setFfprobePath(ffprobePath);
+const numCores = os.cpus().length;
 export async function resizeVideo(originalPath) {
     let returnPath = "resizedVideo_" + originalPath;
     await processResizeVideo(originalPath);
@@ -17,7 +19,14 @@ function processResizeVideo(originalPath) {
         let outputPath = "downloads/resizedVideo_" + originalPath;
         let returnPath = "resizedVideo_" + originalPath;
         ffmpegfluent(actualPath)
-            .size("1080x1920")
+            .size("1920x1080")
+            .outputOptions([
+            "-c:v libx264",
+            `-threads ${numCores}`,
+            `-preset faster`,
+            `-b:v 1000k`,
+            `-crf 28`
+        ])
             .on("end", () => {
             console.log("\nFFmpeg has completed");
             resolve();
@@ -40,7 +49,14 @@ export async function burnSubtitles(videoFilePath, srtFilePath) {
 export async function processburningSubtitles(inputVideoFilePath, inputSrtFilePath, outputPath) {
     return new Promise((resolve, reject) => {
         ffmpegfluent(inputVideoFilePath)
-            .outputOptions(`-vf`, `subtitles=${inputSrtFilePath}`)
+            .outputOptions([
+            `-vf subtitles=${inputSrtFilePath}`,
+            "-c:v libx264",
+            `-crf 28`,
+            `-preset ultrafast`,
+            `-threads ${numCores}`,
+            `-b:v 1000k`
+        ])
             .on("error", (error) => {
             console.log("The error is " + error);
             reject(error);
@@ -57,26 +73,38 @@ export async function processburningSubtitles(inputVideoFilePath, inputSrtFilePa
     });
 }
 export async function combineAudioAndVideo(videoPath, audioPath) {
-    let outputPath = "downloads/finalVideo" + videoPath;
-    let actualVideoPath = "downloads/" + videoPath;
-    let actualAudioPath = audioPath;
-    await processCombiningAudioAndVideo(actualVideoPath, actualAudioPath, outputPath);
-    return outputPath;
+    try {
+        let outputPath = "downloads/finalVideo" + videoPath;
+        let actualVideoPath = "downloads/" + videoPath;
+        let actualAudioPath = audioPath;
+        await processCombiningAudioAndVideo(actualVideoPath, actualAudioPath, outputPath);
+        return outputPath;
+    }
+    catch (err) {
+        console.log("Error inside combineAudioAndVideo ", err);
+        return "";
+    }
 }
 async function processCombiningAudioAndVideo(actualVideoPath, actualAudioPath, outputPath) {
     return new Promise((resolve, reject) => {
         ffmpegfluent(actualVideoPath)
             .input(actualAudioPath)
-            .outputOptions("-c", "copy")
-            .outputOptions("-map", "0:v:0")
-            .outputOptions("-map", "1:a:0")
+            .outputOptions([
+            "-c copy",
+            "-map 0:v:0",
+            "-map 1:a:0",
+            `-threads ${numCores}`,
+            `-b:v 1000k`,
+            `-b:a 128k`,
+            `-preset faster`
+        ])
             .save(outputPath)
             .on("end", () => {
             console.log("Output Video Created successfully");
             resolve();
         }).on("error", (err) => {
             console.log(err);
-            reject();
+            reject(err);
         });
     });
 }
@@ -88,19 +116,24 @@ export async function convertSrtToText(srtFilePath) {
     return fileName;
 }
 async function processConvertingSrtToText(srtPath, outputPath) {
-    let output = "";
+    let output = [];
     return new Promise((resolve, reject) => {
         fs.createReadStream(srtPath)
             .pipe(parse())
             .on("data", (node) => {
-            output += node.data.text + " ";
+            output.push(node.data.text);
         })
             .on("error", (error) => {
             reject(error);
         })
-            .on("finish", () => {
-            filehandle: fs.writeFileSync(outputPath, output);
-            resolve();
+            .on("finish", async () => {
+            try {
+                await fs.writeFileSync(outputPath, output.join(" "));
+                resolve();
+            }
+            catch (ex) {
+                reject(ex);
+            }
         });
     });
 }
@@ -148,6 +181,14 @@ async function processCuttingVideo(videoPath, outputPath) {
                 .setDuration(30)
                 .withVideoCodec('copy')
                 .withAudioCodec('copy')
+                .outputOptions([
+                "-c:v libx264",
+                `-threads ${numCores}`,
+                `-b:v 1000k`,
+                `-b:a 128k`,
+                `-preset fast`,
+                `-crf 28`
+            ])
                 .on('end', function (err) {
                 if (!err) {
                     console.log("Cuting done");
@@ -182,7 +223,10 @@ export function generateSilenceFiles(silenceDurations) {
                 .input('anullsrc=r=44100:cl=stereo') // Input source: silence
                 .inputFormat('lavfi') // Format for the input
                 .audioFilters(`aformat=channel_layouts=stereo`)
-                .duration(duration) // Set duration of silence
+                .outputOptions([`-threads ${numCores}`,
+                `-preset fast`,
+                `-crf 30`
+            ]) // Set duration of silence
                 .output(silenceFile) // Output file path
                 .audioCodec('libmp3lame') // MP3 codec
                 .audioBitrate('128k') // Set audio bitrate
@@ -223,7 +267,10 @@ export async function concatAudioFiles(audioFiles, silentFiles, outputFilePath) 
             }
         });
         // Concatenate the audio files
-        command
+        command.outputOptions([
+            `-threads ${numCores}`
+        ])
+            .audioCodec("copy")
             .on('start', (cmd) => {
             console.log('FFmpeg command:', cmd);
         })

@@ -107,7 +107,7 @@ export default function Video() {
         {error && <div className="text-center text-white">{error}</div>}
         {!loading && !error && blobUrl &&
           (<div className="flex flex-col items-center">
-            <div className="w-full max-w-2xl aspect-[16/9]">
+            <div className="max-h-screen w-full max-w-md aspect-[9/16]">
               <ReactPlayer
                 controls
                 url={blobUrl}

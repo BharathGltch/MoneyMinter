@@ -45,7 +45,7 @@ export default async function processRequest(query, userId) {
     let inputForSubtitlesVideo = resizedVideoPath;
     let inputForSubtitlesSrt = srtFilePath;
     let subtitledVideoPath = await burnSubtitles(inputForSubtitlesVideo, inputForSubtitlesSrt);
-    console.log(subtitledVideoPath);
+    console.log("The wsubtitled video Path is ", subtitledVideoPath);
     //insert the subtitled video path into the db
     //generate text from subtitles
     let textFilePath = await convertSrtToText(srtFilePath);
@@ -59,6 +59,7 @@ export default async function processRequest(query, userId) {
     //combine audio with video files
     let finalVideoPath = await combineAudioAndVideo(subtitledVideoPath, audioFilePath);
     //insert the videoPath
+    console.log("\n\n Final Video Path is ", finalVideoPath);
     await insertFinalVideoPath(coinId, finalVideoPath);
     await insertQueue(finalVideoPath);
     return coinId;

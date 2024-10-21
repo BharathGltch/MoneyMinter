@@ -56,7 +56,7 @@ export default async function processRequest(query:string,userId:string){
       inputForSubtitlesVideo,
       inputForSubtitlesSrt
     );
-    console.log(subtitledVideoPath);
+    console.log("The wsubtitled video Path is ", subtitledVideoPath);
     //insert the subtitled video path into the db
     
     //generate text from subtitles
@@ -73,6 +73,8 @@ export default async function processRequest(query:string,userId:string){
      //combine audio with video files
      let finalVideoPath=await combineAudioAndVideo(subtitledVideoPath,audioFilePath);
       //insert the videoPath
+
+      console.log("\n\n Final Video Path is ",finalVideoPath);
       await insertFinalVideoPath(coinId,finalVideoPath);
       await insertQueue(finalVideoPath);
       return coinId;

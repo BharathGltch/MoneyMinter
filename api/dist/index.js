@@ -1,6 +1,6 @@
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 import { processBodySchema, } from "./@types/index.js";
 import { validateBody } from "./middleware/index.js";
@@ -10,21 +10,30 @@ import { videoReqAuth, checkAndGiveUserId } from "./middleware/Authentication/Au
 import loginRouter from "./routers/loginRouter.js";
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-const corsOptions = {
-    credentials: true,
-    origin: "*", // Whitelist the domains you want to allow
-};
-const allowCrossDomain = (req, res, next) => {
-    res.header(`Access-Control-Allow-Origin`, `http://localhost:5173`);
-    res.header(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
-    res.header(`Access-Control-Allow-Headers`, `Content-Type`);
-    next();
-};
 const app = express();
 const port = process.env.PORT || 3000;
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : "");
+const allowCrossDomain = (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true'); // If you need to send credentials like cookies
+    // Intercept OPTIONS method
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200); // Allow preflight to continue
+    }
+    else {
+        next();
+    }
+};
 app.use(allowCrossDomain);
+app.use(cors());
 app.use(express.json());
+app.use((req, res, next) => {
+    req.setTimeout(240000, () => {
+        res.status(504).send('Request timed out.');
+    });
+    next();
+});
 app.post("/process", validateBody(processBodySchema), checkAndGiveUserId, async (req, res) => {
     let cusReq = req;
     let query = req.body.queryString;
