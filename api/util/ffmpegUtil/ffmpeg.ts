@@ -20,11 +20,9 @@ export async function resizeVideo(originalPath: string) {
 function processResizeVideo(originalPath:string):Promise<void>{
     return new Promise((resolve,reject)=>{
       let actualPath = "downloads/" + originalPath;
-  let videoName = originalPath.slice(0, actualPath.length - 4);
   let outputPath = "downloads/resizedVideo_" + originalPath;
-  let returnPath = "resizedVideo_" + originalPath;
    ffmpegfluent(actualPath)
-    .size("1920x1080")
+    .size("1080x1920")
     .outputOptions([
       "-c:v libx264", 
       `-threads ${numCores}`,

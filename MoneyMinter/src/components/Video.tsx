@@ -96,30 +96,40 @@ export default function Video() {
 
 
   return (
-    <div className="relative z-0" >
+    <div className="relative z-0 max-h-screen max-w-screen" >
 
       <div className="fixed top-0 left-0 h-full w-full z-5">
         <MemoizedParticle />
       </div>
 
-      <div className="relative z-15 container mx-auto px-4 ">
+      <div className="relative z-15 container mx-auto px-4">
         {loading && <div>Loading Video..</div>}
         {error && <div className="text-center text-white">{error}</div>}
-        {!loading && !error && blobUrl &&
-          (<div className="flex flex-col items-center">
-            <div className="max-h-screen w-full max-w-md aspect-[9/16]">
-              <ReactPlayer
-                controls
-                url={blobUrl}
-                width={"100%"}
-                height={"100%"}
-                className="rounded-lg overflow-hidden"
-              /></div>
-            <div className="flex justify-center mt-4">
-              <Button variant="contained" onClick={handleDownload}>Download Video</Button>
+        {!loading && !error && blobUrl && (
+          <div className="flex flex-col items-center w-full">
+            <div className="w-full max-w-md h-[calc(100vh-8rem)] flex items-center justify-center">
+              <div className="relative w-full" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
+                <ReactPlayer
+                  controls
+                  url={blobUrl}
+                  width="100%"
+                  height="100%"
+                  className="rounded-lg !h-auto max-h-[calc(100vh-8rem)]"
+                  style={{
+                    aspectRatio: '9/16',
+                    maxHeight: 'calc(100vh - 8rem)'
+                  }}
+                />
+              </div>
             </div>
-          </div>)
-        }
+            <Button 
+              onClick={handleDownload}
+              className="mt-4"
+            >
+              Download Video
+            </Button>
+          </div>
+        )}
       </div>
 
     </div>

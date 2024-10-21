@@ -3,7 +3,6 @@ import { insertQueue } from "../BullQueue/queue.js";
 import { burnSubtitles, combineAudioAndVideo, convertSrtToText, cutVideo, getVideoDuration, resizeVideo } from "../ffmpegUtil/ffmpeg.js";
 import { textToSpeechWithSilence } from "../ffmpegUtil/genAudio.js";
 import { generateScript, getJsonSearchTerms, getSrtFile } from "../geminiFolder/gemini.js";
-import { textToSpeech } from "../gtts/gttsUtil.js";
 import { downloadVideo, getPexelsVideo } from "../pexels/pexels.js";
 
 export default async function processRequest(query:string,userId:string){
