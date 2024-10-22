@@ -1,7 +1,6 @@
 import express,{Request,Response,NextFunction} from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 import {
   TypedRequestBody,
@@ -17,7 +16,10 @@ import {
 import processRequest from "./util/processUtil/processUtil.js";
 import { videoReqAuth, checkAndGiveUserId, CustomRequest } from "./middleware/Authentication/AuthMiddleWare.js";
 import loginRouter from "./routers/loginRouter.js";
-
+import "./util/CronJob/cronJob.js";
+import { filesToBeDeletedArray } from "./util/BullQueue/FilesToBeDeletedArray.js";
+import path,{dirname} from "path";
+import { fileURLToPath } from "url";
 
 
 dotenv.config();
@@ -44,24 +46,22 @@ const allowCrossDomain = (req: Request, res: Response, next: NextFunction) => {
 app.use(allowCrossDomain);
 app.use(cors());
 app.use(express.json());
-app.use((req, res, next) => {
-  req.setTimeout(240000, () => {
-    res.status(504).send('Request timed out.');
-  });
-  next();
-});
+
 
 app.post(
   "/process",
   validateBody(processBodySchema),
   checkAndGiveUserId,
   async (req: TypedRequestBody<{ token: string, queryString: string }>, res) => {
+    console.log( 'The Files to be deleted Array is ',filesToBeDeletedArray.toString());
+    console.log("the directory name is ",import.meta.dirname);
     let cusReq = req as CustomRequest;
     let query = req.body.queryString;
     let userId = cusReq.userId;
     console.log("The query is " + query);
     let videoId = await processRequest(query, userId);
     res.json({ token: cusReq.token, videoId });
+    console.log( 'The Files to be deleted Array is ',filesToBeDeletedArray.toString());
   }
 );
 
