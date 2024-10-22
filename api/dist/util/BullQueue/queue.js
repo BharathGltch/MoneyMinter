@@ -6,7 +6,8 @@ const videoQueue = new Bull('videoQueue', {
         password: "mF5IVnzMy0Ok5FoTwDYCJtVjsukmUg4V"
     },
 });
-const insertQueue = (videoPath) => {
-    videoQueue.add({ videoPath });
+const insertQueue = async (videoPath) => {
+    const delayTime = 1 * 60 * 1000;
+    await videoQueue.add({ videoPath }, { delay: delayTime });
 };
 export { videoQueue, insertQueue };

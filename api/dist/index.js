@@ -8,6 +8,7 @@ import { getVideoPath, } from "./drizzle/dbUtil/dbUtil.js";
 import processRequest from "./util/processUtil/processUtil.js";
 import { videoReqAuth, checkAndGiveUserId } from "./middleware/Authentication/AuthMiddleWare.js";
 import loginRouter from "./routers/loginRouter.js";
+import "./util/CronJob/cronJob.js";
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const app = express();
@@ -30,17 +31,20 @@ app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
     req.setTimeout(240000, () => {
-        res.status(504).send('Request timed out.');
+        return res.status(504).send('Request timed out Custom Request TImeout.');
     });
     next();
 });
 app.post("/process", validateBody(processBodySchema), checkAndGiveUserId, async (req, res) => {
+    console.log('The Files to be deleted Array is ', filesToBeDeletedArray.toString());
+    console.log("the directory name is ", import.meta.dirname);
     let cusReq = req;
     let query = req.body.queryString;
     let userId = cusReq.userId;
     console.log("The query is " + query);
     let videoId = await processRequest(query, userId);
     res.json({ token: cusReq.token, videoId });
+    console.log('The Files to be deleted Array is ', filesToBeDeletedArray.toString());
 });
 app.get("/video/:videoId", videoReqAuth, async (expressRequest, _res) => {
     const req = expressRequest;

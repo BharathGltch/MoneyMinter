@@ -4,6 +4,7 @@ import { burnSubtitles, combineAudioAndVideo, convertSrtToText, cutVideo, getVid
 import { textToSpeechWithSilence } from "../ffmpegUtil/genAudio.js";
 import { generateScript, getJsonSearchTerms, getSrtFile } from "../geminiFolder/gemini.js";
 import { downloadVideo, getPexelsVideo } from "../pexels/pexels.js";
+import { filesToBeDeletedArray } from "../BullQueue/FilesToBeDeletedArray.js";
 
 export default async function processRequest(query:string,userId:string){
     let coinId = await createCoin(query,userId);
@@ -19,9 +20,11 @@ export default async function processRequest(query:string,userId:string){
     let videoLink = await getPexelsVideo(searchTerms[0]);
     //download Video
     let pexelsVideoPath = await downloadVideo(videoLink);
+    //add pexelsVideoPath to the deletion queue
     console.log("The pexels video path after downloading is "+pexelsVideoPath);
     //save the path to the db
     // await insertPexelsVideoPath(coinId, pexelsVideoPath);
+    filesToBeDeletedArray.push(pexelsVideoPath);
     console.log("Inserted Pexel Video Path");
     //generate the srt file
     let videoDuration=await getVideoDuration(pexelsVideoPath);
@@ -30,6 +33,7 @@ export default async function processRequest(query:string,userId:string){
     if(videoDuration>30){
       console.log("Inside cut video\n");
         pexelsVideoPath=await cutVideo(pexelsVideoPath);
+        filesToBeDeletedArray.push(pexelsVideoPath);
         videoDuration=30;
         console.log("Outside cut video\n");
 
@@ -38,7 +42,8 @@ export default async function processRequest(query:string,userId:string){
 
     let fileName = pexelsVideoPath.slice(0, pexelsVideoPath.length - 4);
     let srtFilePath = await getSrtFile(fileName, generatedScript,videoDuration);
-    console.log("The srtFiePath is " + srtFilePath);
+    filesToBeDeletedArray.push(srtFilePath);
+    console.log("The srtFilePath is " + srtFilePath);
 
     //insert the srt file path
     // await insertSrtFilePath(coinId, srtFilePath);
@@ -46,6 +51,7 @@ export default async function processRequest(query:string,userId:string){
     //add subtitles to the resized video
     console.log("The pexels Video Path is " + pexelsVideoPath);
     let resizedVideoPath = await resizeVideo(pexelsVideoPath);
+    filesToBeDeletedArray.push(resizedVideoPath);
     console.log("The resizedVideopath in index is " + resizedVideoPath);
 
     //add subtitles to the resized video path
@@ -55,15 +61,18 @@ export default async function processRequest(query:string,userId:string){
       inputForSubtitlesVideo,
       inputForSubtitlesSrt
     );
-    console.log("The wsubtitled video Path is ", subtitledVideoPath);
+    filesToBeDeletedArray.push(subtitledVideoPath);
+    console.log("The subtitled video Path is ", subtitledVideoPath);
     //insert the subtitled video path into the db
     
     //generate text from subtitles
     let textFilePath = await convertSrtToText(srtFilePath);
-    console.log(textFilePath);
+    console.log("The TextFilePath is ",textFilePath);
+    filesToBeDeletedArray.push(textFilePath);
 
     let audioWithSilence=await textToSpeechWithSilence(srtFilePath,coinId);
     console.log("The audioWithSilence Path in process.js  is ",audioWithSilence);
+    filesToBeDeletedArray.push(audioWithSilence);
     //generate audio from the textFile
      //let audioFilePath =await textToSpeech(textFilePath);
      let audioFilePath=audioWithSilence;
@@ -75,6 +84,6 @@ export default async function processRequest(query:string,userId:string){
 
       console.log("\n\n Final Video Path is ",finalVideoPath);
       await insertFinalVideoPath(coinId,finalVideoPath);
-      await insertQueue(finalVideoPath);
+      filesToBeDeletedArray.push(finalVideoPath);
       return coinId;
 } 

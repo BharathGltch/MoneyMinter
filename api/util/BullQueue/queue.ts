@@ -12,8 +12,10 @@ const videoQueue=new Bull<VideoJobData>('videoQueue',{
     },
 });
 
-const insertQueue=(videoPath:string)=>{
-        videoQueue.add({videoPath});
+const insertQueue= async (videoPath:string)=>{
+        const delayTime=1*60*1000;
+
+       await  videoQueue.add({videoPath},{delay:delayTime});
 }
 
 export { VideoJobData,videoQueue,insertQueue};
