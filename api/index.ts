@@ -16,8 +16,7 @@ import {
 import processRequest from "./util/processUtil/processUtil.js";
 import { videoReqAuth, checkAndGiveUserId, CustomRequest } from "./middleware/Authentication/AuthMiddleWare.js";
 import loginRouter from "./routers/loginRouter.js";
-import path,{dirname} from "path";
-import { fileURLToPath } from "url";
+import { filesToBeDeletedArray } from "./util/BullQueue/FilesToBeDeletedArray.js";
 
 
 dotenv.config();
