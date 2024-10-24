@@ -50,9 +50,8 @@ export async function processburningSubtitles(inputVideoFilePath, inputSrtFilePa
             .outputOptions([
             `-vf subtitles=${inputSrtFilePath}`,
             "-c:v libx264",
-            `-crf 28`,
+            `-crf 32`,
             `-preset ultrafast`,
-            `-threads ${numCores}`,
             `-b:v 1000k`
         ])
             .on("error", (error) => {

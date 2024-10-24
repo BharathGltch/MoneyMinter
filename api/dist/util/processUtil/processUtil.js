@@ -8,6 +8,7 @@ export default async function processRequest(query, userId) {
     let coinId = await createCoin(query, userId);
     //generate the script
     let generatedScript = await generateScript(query);
+    Promise.all([createCoin(query, userId), generateScript(query)]);
     //Insert Script into Table
     // await insertScript(coinId, generatedScript);
     //generate the jsonSearchTerms

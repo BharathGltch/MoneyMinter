@@ -25,7 +25,7 @@ function processResizeVideo(originalPath:string):Promise<void>{
     .size("1080x1920")
     .outputOptions([
       "-c:v libx264", 
-      `-threads ${numCores}`,
+      `-threads ${numCores-1}`,
       `-preset faster`,
       `-b:v 1000k`,
       `-crf 28`
@@ -59,6 +59,7 @@ export async function burnSubtitles(videoFilePath: string, srtFilePath: string) 
         "-c:v libx264",
         `-crf 32`,
         `-preset ultrafast`,
+        `-threads ${numCores}`,
         `-b:v 1000k`
       ])
       .on("error", (error) => {
