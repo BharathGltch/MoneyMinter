@@ -25,7 +25,6 @@ function processResizeVideo(originalPath:string):Promise<void>{
     .size("1080x1920")
     .outputOptions([
       "-c:v libx264", 
-      `-threads ${numCores-1}`,
       `-preset faster`,
       `-b:v 1000k`,
       `-crf 28`
@@ -59,7 +58,7 @@ export async function burnSubtitles(videoFilePath: string, srtFilePath: string) 
         "-c:v libx264",
         `-crf 32`,
         `-preset ultrafast`,
-        `-threads ${numCores}`,
+        
         `-b:v 1000k`
       ])
       .on("error", (error) => {
@@ -99,7 +98,7 @@ async function processCombiningAudioAndVideo(actualVideoPath:string,actualAudioP
       "-c copy",   
       "-map 0:v:0", 
       "-map 1:a:0",
-      `-threads ${numCores}`,
+      
       `-b:v 1000k`,
       `-b:a 128k`,
       `-preset faster`
@@ -201,7 +200,7 @@ async function processCuttingVideo(videoPath:string,outputPath:string):Promise<v
         .withAudioCodec('copy')
         .outputOptions([
            "-c:v libx264", 
-          `-threads ${numCores}`,
+          
           `-b:v 1000k`,
           `-b:a 128k`,
           `-preset fast`,
@@ -245,7 +244,7 @@ export function generateSilenceFiles(silenceDurations: number[]): Promise<string
               .input('anullsrc=r=44100:cl=stereo') // Input source: silence
               .inputFormat('lavfi') // Format for the input
               .audioFilters(`aformat=channel_layouts=stereo`)
-              .outputOptions([`-threads ${numCores}`,
+              .outputOptions([
                 `-preset fast`,
                 `-crf 30`
               ]) // Set duration of silence
@@ -295,9 +294,7 @@ export async function concatAudioFiles(audioFiles:string[],silentFiles:string[],
     });
 
     // Concatenate the audio files
-    command.outputOptions([
-      `-threads ${numCores}`
-    ])
+    command
     .audioCodec("copy")
     .on('start',(cmd)=>{
       console.log('FFmpeg command:', cmd);
