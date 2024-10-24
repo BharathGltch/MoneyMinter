@@ -50,32 +50,39 @@ export async function burnSubtitles(videoFilePath: string, srtFilePath: string) 
   return retPath;
 }
 
- export async function processburningSubtitles(inputVideoFilePath:string,inputSrtFilePath:string,outputPath:string):Promise<void>{
-    return new Promise((resolve,reject)=>{
-      ffmpegfluent(inputVideoFilePath)
+export async function processburningSubtitles(inputVideoFilePath: string, inputSrtFilePath: string, outputPath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // Escape special characters in the path
+    console.log("Inside the Promise that handel processBurning Subtitles");
+    const escapedSrtPath = inputSrtFilePath.replace(/[\\]/g, '\\\\').replace(/[']/g, "\\'").replace(/[\:]/g, '\\:');
+    console.log("The escaped path is ",escapedSrtPath);
+    console.log("Checking file existence:");
+    console.log("Video file exists:", fs.existsSync(inputVideoFilePath));
+    console.log("SRT file exists:", fs.existsSync(inputSrtFilePath));
+    
+    ffmpegfluent(inputVideoFilePath)
       .outputOptions([
-        `-vf subtitles=${inputSrtFilePath}`,
+        // Escape the path for the subtitles filter
+        `-vf subtitles='${escapedSrtPath}'`,
         "-c:v libx264",
-        `-crf 32`,
-        `-preset ultrafast`,
-        
-        `-b:v 1000k`
+        "-crf 32",
+        "-preset ultrafast",
+        "-b:v 1000k"
       ])
       .on("error", (error) => {
-        console.log("The error is "+error);
+        console.log("Error in subtitle burning:", error);
         reject(error);
       })
-      .on("complete", () => {
-        console.log("complete");
+      .on("start", (commandLine) => {
+        console.log("FFmpeg command:", commandLine);
       })
       .on("end", () => {
-        console.log("Processing finished succesfully");
+        console.log("Subtitle burning finished successfully");
         resolve();
       })
       .save(outputPath);
-    return outputPath;
-    })
- }  
+  });
+}
 
 export async function combineAudioAndVideo(videoPath:string,audioPath:string) {
 

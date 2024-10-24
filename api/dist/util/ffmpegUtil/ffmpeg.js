@@ -20,7 +20,6 @@ function processResizeVideo(originalPath) {
             .size("1080x1920")
             .outputOptions([
             "-c:v libx264",
-            `-threads ${numCores}`,
             `-preset faster`,
             `-b:v 1000k`,
             `-crf 28`
@@ -46,27 +45,34 @@ export async function burnSubtitles(videoFilePath, srtFilePath) {
 }
 export async function processburningSubtitles(inputVideoFilePath, inputSrtFilePath, outputPath) {
     return new Promise((resolve, reject) => {
+        // Escape special characters in the path
+        console.log("Inside the Promise that handel processBurning Subtitles");
+        const escapedSrtPath = inputSrtFilePath.replace(/[\\]/g, '\\\\').replace(/[']/g, "\\'").replace(/[\:]/g, '\\:');
+        console.log("The escaped path is ", escapedSrtPath);
+        console.log("Checking file existence:");
+        console.log("Video file exists:", fs.existsSync(inputVideoFilePath));
+        console.log("SRT file exists:", fs.existsSync(inputSrtFilePath));
         ffmpegfluent(inputVideoFilePath)
             .outputOptions([
-            `-vf subtitles=${inputSrtFilePath}`,
+            // Escape the path for the subtitles filter
+            `-vf subtitles='${escapedSrtPath}'`,
             "-c:v libx264",
-            `-crf 32`,
-            `-preset ultrafast`,
-            `-b:v 1000k`
+            "-crf 32",
+            "-preset ultrafast",
+            "-b:v 1000k"
         ])
             .on("error", (error) => {
-            console.log("The error is " + error);
+            console.log("Error in subtitle burning:", error);
             reject(error);
         })
-            .on("complete", () => {
-            console.log("complete");
+            .on("start", (commandLine) => {
+            console.log("FFmpeg command:", commandLine);
         })
             .on("end", () => {
-            console.log("Processing finished succesfully");
+            console.log("Subtitle burning finished successfully");
             resolve();
         })
             .save(outputPath);
-        return outputPath;
     });
 }
 export async function combineAudioAndVideo(videoPath, audioPath) {
@@ -90,7 +96,6 @@ async function processCombiningAudioAndVideo(actualVideoPath, actualAudioPath, o
             "-c copy",
             "-map 0:v:0",
             "-map 1:a:0",
-            `-threads ${numCores}`,
             `-b:v 1000k`,
             `-b:a 128k`,
             `-preset faster`
@@ -180,7 +185,6 @@ async function processCuttingVideo(videoPath, outputPath) {
                 .withAudioCodec('copy')
                 .outputOptions([
                 "-c:v libx264",
-                `-threads ${numCores}`,
                 `-b:v 1000k`,
                 `-b:a 128k`,
                 `-preset fast`,
@@ -220,7 +224,7 @@ export function generateSilenceFiles(silenceDurations) {
                 .input('anullsrc=r=44100:cl=stereo') // Input source: silence
                 .inputFormat('lavfi') // Format for the input
                 .audioFilters(`aformat=channel_layouts=stereo`)
-                .outputOptions([`-threads ${numCores}`,
+                .outputOptions([
                 `-preset fast`,
                 `-crf 30`
             ]) // Set duration of silence
@@ -264,9 +268,7 @@ export async function concatAudioFiles(audioFiles, silentFiles, outputFilePath) 
             }
         });
         // Concatenate the audio files
-        command.outputOptions([
-            `-threads ${numCores}`
-        ])
+        command
             .audioCodec("copy")
             .on('start', (cmd) => {
             console.log('FFmpeg command:', cmd);
