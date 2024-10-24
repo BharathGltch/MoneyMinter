@@ -38,7 +38,6 @@ export default async function processRequest(query:string,userId:string){
         console.log("Outside cut video\n");
 
     }
-    console.log("Video duration is",videoDuration);
 
     let fileName = pexelsVideoPath.slice(0, pexelsVideoPath.length - 4);
     let srtFilePath = await getSrtFile(fileName, generatedScript,videoDuration);
