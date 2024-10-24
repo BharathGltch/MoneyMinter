@@ -57,9 +57,8 @@ export async function burnSubtitles(videoFilePath: string, srtFilePath: string) 
       .outputOptions([
         `-vf subtitles=${inputSrtFilePath}`,
         "-c:v libx264",
-        `-crf 28`,
+        `-crf 32`,
         `-preset ultrafast`,
-        `-threads ${numCores}`,
         `-b:v 1000k`
       ])
       .on("error", (error) => {
