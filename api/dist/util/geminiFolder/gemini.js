@@ -14,7 +14,7 @@ export async function getJsonSearchTerms(query, script, noOfSearchTerms) {
     here is an example of JSON-array of strings:
     ["search term 1","search term 2","search term 3"]
 
-    Obviously, the search terms should be related to the subject of the video
+    Obviously, the search terms should be related to the subject of the video and should not be sexually explicit.
 
     ONLY return the array of JSON-array of strings.
     Do not return anything else like "heres the response" or " \`\`\`json"
@@ -76,6 +76,7 @@ export async function generateScript(queryString) {
   Example: idea:Write a story about C++
   Example Response:"C++ is the mightiest language of all which was created in the year..." and so on.
   Optimize the script so that it might get the maximize views on Youtube. It should be concise if possible.
+  Do not add subtitles to it. Just the script that should be read out loud.
 
   Here is the idea:${queryString}
   `;

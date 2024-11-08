@@ -27,6 +27,7 @@ function processResizeVideo(originalPath:string):Promise<void>{
       "-c:v libx264", 
       `-preset faster`,
       `-b:v 1000k`,
+      `-threads ${numCores}`,
       `-crf 28`
     ])
     .on("end", () => {
@@ -105,7 +106,7 @@ async function processCombiningAudioAndVideo(actualVideoPath:string,actualAudioP
       "-c copy",   
       "-map 0:v:0", 
       "-map 1:a:0",
-      
+      `-threads ${numCores}`,
       `-b:v 1000k`,
       `-b:a 128k`,
       `-preset faster`
@@ -207,7 +208,7 @@ async function processCuttingVideo(videoPath:string,outputPath:string):Promise<v
         .withAudioCodec('copy')
         .outputOptions([
            "-c:v libx264", 
-          
+           `-threads ${numCores}`,
           `-b:v 1000k`,
           `-b:a 128k`,
           `-preset fast`,
@@ -253,7 +254,8 @@ export function generateSilenceFiles(silenceDurations: number[]): Promise<string
               .audioFilters(`aformat=channel_layouts=stereo`)
               .outputOptions([
                 `-preset fast`,
-                `-crf 30`
+                `-crf 30`,
+                `-threads ${numCores}`,
               ]) // Set duration of silence
               .output(silenceFile) // Output file path
               .audioCodec('libmp3lame') // MP3 codec
@@ -356,7 +358,8 @@ export async function concatAudioFilesWithSilence(
       })
       .save(outputFilePath)
       .outputOptions('-map', '[outa]')
-      .outputOptions('-acodec', 'copy');
+      .outputOptions('-acodec', 'copy')
+      .outputOptions(`-threads`,`${numCores}`);
   });
 }
 
