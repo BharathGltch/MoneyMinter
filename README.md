@@ -19,6 +19,8 @@ Tailwind
 
 Postgresql
 
-Kafka MQ
+Redis
+
+Bull MQ
 
 Inspired from FujiwaraChoka
