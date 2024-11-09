@@ -7,10 +7,10 @@ The subtitles are burned into the video using ffmpeg. The TikTok TTS is used for
 
 Tech Stack:
 
-ReactJS
-NodeJS
-Drizzle
-MaterialUI
+ReactJS \n
+NodeJS \n
+Drizzle \n
+MaterialUI \n
 Tailwind
 Postgresql
 Redis
